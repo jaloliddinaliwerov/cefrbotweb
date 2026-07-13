@@ -156,8 +156,12 @@
                         </div>
                     </div>
                     
-                    <!-- Settings Button -->
+                    <!-- API Status + Settings -->
                     <div class="flex items-center gap-2">
+                        <div id="api-status-badge" onclick="openSettings()" class="cursor-pointer flex items-center gap-1.5 rounded-xl px-3 py-1.5 bg-slate-100 hover:bg-slate-200 transition">
+                            <span id="api-status-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+                            <span id="api-status-text" class="text-xs text-slate-500 font-medium hidden sm:block">Ulanmagan</span>
+                        </div>
                         <button onclick="openSettings()" class="rounded-xl p-2 bg-slate-100 hover:bg-slate-200 text-slate-650 transition">
                             <i class="fa-solid fa-gear text-sm"></i>
                         </button>
@@ -495,7 +499,9 @@
 
     <!-- Embedded Javascript Logic -->
     <script>
-        let API_URL = localStorage.getItem('api_url') || window.location.origin;
+        // Never use vercel.app as API_URL — it is only a frontend
+        const _stored = localStorage.getItem('api_url');
+        let API_URL = (_stored && !_stored.includes('vercel.app')) ? _stored : '';
         let adminToken = localStorage.getItem('admin_token') || '';
 
         // Data arrays for editing
@@ -526,18 +532,11 @@
                 const cleanUrl = apiUrlParam.trim().replace(/\/$/, "");
                 localStorage.setItem('api_url', cleanUrl);
                 API_URL = cleanUrl;
-            } else if (!localStorage.getItem('api_url')) {
-                // Fallback: use current origin if it looks like a Railway URL
-                const origin = window.location.origin;
-                if (!origin.includes('vercel.app') && !origin.includes('localhost')) {
-                    localStorage.setItem('api_url', origin);
-                    API_URL = origin;
-                }
             } else {
-                API_URL = localStorage.getItem('api_url');
+                // No api_url param — use stored value (already set above)
             }
 
-            document.getElementById('api-url-input').value = API_URL;
+            document.getElementById('api-url-input').value = API_URL || '';
 
             const tokenParam = urlParams.get('token');
             if (tokenParam) {
@@ -546,7 +545,14 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            checkAdminStatus();
+            updateApiStatusBadge();
+
+            // If API URL is missing or pointing to Vercel, auto-open settings
+            if (!API_URL || API_URL.includes('vercel.app')) {
+                setTimeout(() => openSettings(), 600);
+            } else {
+                checkAdminStatus();
+            }
             addQuestionRow();
         });
 
@@ -564,18 +570,37 @@
         function closeSettings() {
             document.getElementById('settings-modal').classList.add('hidden');
         }
+        function updateApiStatusBadge() {
+            const dot = document.getElementById('api-status-dot');
+            const text = document.getElementById('api-status-text');
+            if (!API_URL || API_URL.includes('vercel.app')) {
+                dot.className = 'w-2 h-2 rounded-full bg-red-500';
+                text.textContent = 'API Ulanmagan';
+                text.className = 'text-xs text-red-500 font-medium hidden sm:block';
+            } else {
+                const short = API_URL.replace('https://', '').split('.')[0];
+                dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+                text.textContent = short;
+                text.className = 'text-xs text-emerald-600 font-medium hidden sm:block';
+            }
+        }
+
         function saveSettings() {
             const url = document.getElementById('api-url-input').value.trim().replace(/\/$/, "");
             if (!url || !url.startsWith('http')) {
-                showAlert('Noto\'g\'ri URL. https:// bilan boshlang.');
+                showAlert('Noto\'g\'ri URL. Railway backendingiz manzilini kiriting. Masalan: https://zakas-bot.up.railway.app');
+                return;
+            }
+            if (url.includes('vercel.app')) {
+                showAlert('Bu Vercel manzili! Railway backend manzilini kiriting (railway.app bilan tugaydi).');
                 return;
             }
             localStorage.setItem('api_url', url);
             API_URL = url;
+            updateApiStatusBadge();
             closeSettings();
-            // Reload to re-initialize with new API URL
+            checkAdminStatus();
             loadAdminData();
-            showAlert('Saqlandi! API: ' + API_URL);
         }
 
         function switchAdminSubTab(subName) {
