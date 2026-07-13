@@ -192,21 +192,24 @@
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-800 tracking-tight"><i class="fa-solid fa-lock-open mr-2 text-blue-500"></i>Admin Dashboard</h2>
-                        <p class="text-slate-555 text-xs">Savollar, insholar va mock imtihonlarni boshqarish</p>
+                        <p class="text-slate-555 text-xs">Savollar, topshiriqlar, o'quvchilar va javoblar tahlili</p>
                     </div>
                     <button onclick="logoutAdmin()" class="apple-btn-secondary bg-red-50 border-red-200 hover:bg-red-100 text-red-600 py-2 px-4 text-xs font-semibold">Tizimdan chiqish</button>
                 </div>
 
                 <!-- Inner sub-navigation (Segmented Control) -->
-                <div class="flex segmented-control w-full sm:w-max mb-6">
-                    <button onclick="switchAdminSubTab('questions')" id="admin-sub-nav-questions" class="segmented-btn active px-4 py-1.5 text-xs font-semibold flex-1 sm:flex-none">
+                <div class="flex segmented-control w-full sm:w-max mb-6 overflow-x-auto">
+                    <button onclick="switchAdminSubTab('questions')" id="admin-sub-nav-questions" class="segmented-btn active px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
                         <i class="fa-solid fa-book-open mr-1.5"></i>Reading & Listening
                     </button>
-                    <button onclick="switchAdminSubTab('writing')" id="admin-sub-nav-writing" class="segmented-btn px-4 py-1.5 text-xs font-semibold flex-1 sm:flex-none">
+                    <button onclick="switchAdminSubTab('writing')" id="admin-sub-nav-writing" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
                         <i class="fa-solid fa-file-signature mr-1.5"></i>Writing & Speaking Tasks
                     </button>
-                    <button onclick="switchAdminSubTab('mocks')" id="admin-sub-nav-mocks" class="segmented-btn px-4 py-1.5 text-xs font-semibold flex-1 sm:flex-none">
+                    <button onclick="switchAdminSubTab('mocks')" id="admin-sub-nav-mocks" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
                         <i class="fa-solid fa-layer-group mr-1.5"></i>Mock Exams Builder
+                    </button>
+                    <button onclick="switchAdminSubTab('users')" id="admin-sub-nav-users" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
+                        <i class="fa-solid fa-users mr-1.5"></i>O'quvchilar & Ovozlar
                     </button>
                 </div>
 
@@ -414,6 +417,37 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 4. Users & Speaking Submissions Manager -->
+                <div id="admin-sub-users" class="admin-sub-content hidden space-y-6">
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <!-- Users List Card -->
+                        <div class="apple-card p-6 space-y-4">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-graduation-cap text-blue-500 mr-2"></i>O'quvchilar ro'yxati</h3>
+                            <div class="overflow-x-auto max-h-96">
+                                <table class="w-full text-sm text-left">
+                                    <thead>
+                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Ism</th>
+                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Username</th>
+                                            <th class="p-3 text-xs font-bold uppercase tracking-wider text-center">XP</th>
+                                            <th class="p-3 text-xs font-bold uppercase tracking-wider text-center">Streak</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-users-tbody" class="divide-y divide-slate-100">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Speaking Submissions List Card -->
+                        <div class="apple-card p-6 space-y-4">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-microphone text-rose-500 mr-2"></i>Speaking javoblari (Ovozlar)</h3>
+                            <div class="space-y-4 overflow-y-auto max-h-96 pr-1" id="admin-speaking-submissions-container">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
         </main>
         
@@ -429,7 +463,7 @@
             <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-gear mr-2 text-slate-500"></i>Backend API Sozlamasi</h3>
             
             <div class="space-y-2">
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Backend URL manzili</label>
+                <label class="text-[10px] font-bold text-slate-555 uppercase tracking-wider">Backend URL manzili</label>
                 <input type="text" id="api-url-input" placeholder="https://example.railway.app" class="apple-input text-xs w-full">
                 <p class="text-[10px] text-slate-400">FastAPI backendining Railway manzilini kiriting.</p>
             </div>
@@ -545,6 +579,70 @@
             loadAdminQuestions();
             loadAdminTasks();
             loadAdminMocks();
+            loadAdminUsers();
+            loadAdminSpeakingSubmissions();
+        }
+
+        async function loadAdminUsers() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const users = await response.json();
+                const tbody = document.getElementById('admin-users-tbody');
+                tbody.innerHTML = users.length === 0 ? '<tr><td colspan="4" class="text-slate-400 italic text-center p-4">O\'quvchilar mavjud emas.</td></tr>' : '';
+                users.forEach(u => {
+                    const premBadge = u.is_premium ? ' 👑' : '';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 border-b border-slate-100 text-slate-800">
+                            <td class="p-3 font-semibold">${u.first_name}${premBadge}</td>
+                            <td class="p-3 text-xs text-slate-555">@${u.username || ''}</td>
+                            <td class="p-3 text-center font-bold text-slate-700">${u.xp}</td>
+                            <td class="p-3 text-center text-orange-500 font-semibold">${u.streak} kun</td>
+                        </tr>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadAdminSpeakingSubmissions() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/speaking-submissions`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const subs = await response.json();
+                const container = document.getElementById('admin-speaking-submissions-container');
+                container.innerHTML = subs.length === 0 ? '<div class="text-slate-400 italic text-xs p-4 text-center">Yuborilgan ovozli javoblar mavjud emas.</div>' : '';
+                subs.forEach(s => {
+                    container.innerHTML += `
+                        <div class="p-4 border border-slate-100 rounded-2xl bg-white space-y-3 shadow-sm">
+                            <div class="flex items-center justify-between border-b border-slate-50 pb-2">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-800">${s.user_name} (@${s.user_username || ''})</h4>
+                                    <p class="text-[10px] text-slate-500">${s.submitted_at}</p>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${s.score >= 70 ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}">${s.task_level} — ${s.score}/100</span>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Topshiriq:</p>
+                                <p class="text-xs font-semibold text-slate-700">${s.task_title} (Part ${s.task_part})</p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-[10px] font-bold text-slate-450 uppercase tracking-wider">Transkripsiya:</p>
+                                <p class="text-xs text-slate-650 italic">"${s.transcription}"</p>
+                            </div>
+                            <div class="pt-1">
+                                <p class="text-[10px] font-bold text-slate-450 uppercase tracking-wider mb-1.5">Ovozli xabar:</p>
+                                <audio controls src="${API_URL}/api/admin/voice/${s.voice_file_id}?token=${adminToken}" class="w-full h-8 rounded-lg bg-slate-50 border border-slate-200"></audio>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         async function loadAdminQuestions() {
@@ -567,7 +665,7 @@
                             <td class="p-3 text-slate-800 font-semibold">${q.title}</td>
                             <td class="p-3 text-center text-slate-700 font-bold">${q.questions_json.length} ta</td>
                             <td class="p-3 text-right">
-                                <button onclick="deleteQuestion(${q.id})" class="text-red-500 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="deleteQuestion(${q.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -624,7 +722,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" placeholder="A variant" class="apple-input text-xs w-full py-1.5 row-opt-a">
                     <input type="text" placeholder="B variant" class="apple-input text-xs w-full py-1.5 row-opt-b">
-                    <input type="text" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-c">
+                    <input type="text" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
                     <input type="text" placeholder="D variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
                 </div>
                 <div class="w-1/3">
@@ -679,7 +777,6 @@
             const formData = new FormData();
             formData.append('file', file);
             
-            statusDiv.innerText = "Yuklanmoqda... ";
             statusDiv.innerHTML = 'Yuklanmoqda... <i class="fa-solid fa-spinner fa-spin text-blue-500 ml-1"></i>';
             statusDiv.className = "text-[10px] text-blue-500 mt-1";
             
@@ -918,7 +1015,7 @@
                             <td class="p-3 text-slate-600">${m.writing_ids.length} ta</td>
                             <td class="p-3 text-slate-600">${m.speaking_ids.length} ta</td>
                             <td class="p-3 text-right">
-                                <button onclick="deleteMock(${m.id})" class="text-red-500 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="deleteMock(${m.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
