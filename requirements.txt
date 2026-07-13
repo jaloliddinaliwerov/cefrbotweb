@@ -1,0 +1,4 @@
+fastapi
+pydantic
+jinja2
+aiogram>=3.7.0
