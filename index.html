@@ -29,6 +29,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
         body {
@@ -420,9 +422,21 @@
                                 <textarea id="q-text" rows="5" placeholder="Reading test matnini bu yerga joylang..." class="apple-input text-xs w-full"></textarea>
                             </div>
 
-                            <div id="listening-audio-wrapper" class="hidden space-y-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio link manzili (URL)</label>
-                                <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="apple-input text-xs w-full">
+                            <div id="listening-audio-wrapper" class="hidden space-y-3">
+                                 <div class="flex gap-2">
+                                     <button type="button" onclick="toggleAudioInputType('url')" id="btn-audio-type-url" class="apple-btn-secondary py-1 px-3 text-xs bg-slate-100 font-semibold">URL Manzil</button>
+                                     <button type="button" onclick="toggleAudioInputType('file')" id="btn-audio-type-file" class="apple-btn-secondary py-1 px-3 text-xs">Fayl yuklash</button>
+                                 </div>
+                                 <div id="audio-input-url-container" class="space-y-1">
+                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio link manzili (URL)</label>
+                                     <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="apple-input text-xs w-full">
+                                 </div>
+                                 <div id="audio-input-file-container" class="hidden space-y-2">
+                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio faylni tanlang</label>
+                                     <input type="file" id="q-audio-file" accept="audio/*,video/*" class="apple-input text-xs w-full">
+                                     <button type="button" onclick="uploadAudioFile()" class="apple-btn-secondary text-[11px] py-1 px-3">Faylni Serverga yuklash</button>
+                                     <div id="audio-upload-status" class="text-[10px] text-slate-500"></div>
+                                 </div>
                             </div>
 
                             <!-- Dynamic Questions Builder -->
@@ -618,6 +632,10 @@
         let chartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.ready();
+                window.Telegram.WebApp.expand();
+            }
             if (!localStorage.getItem('api_url') && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
                 API_URL = window.location.origin;
             }
@@ -670,9 +688,10 @@
             if (activeBtn) activeBtn.classList.add('active');
 
             if (tabName === 'dashboard') {
-                const lastSearchedId = localStorage.getItem('last_searched_tg_id') || 123456789;
-                document.getElementById('stats-tg-id').value = lastSearchedId;
-                loadDashboard(lastSearchedId);
+                let tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+                let defaultId = tgUser && tgUser.id ? tgUser.id : (localStorage.getItem('last_searched_tg_id') || 123456789);
+                document.getElementById('stats-tg-id').value = defaultId;
+                loadDashboard(defaultId);
             } else if (tabName === 'leaderboard') {
                 loadLeaderboard();
             } else if (tabName === 'mock') {
@@ -957,6 +976,74 @@
             }
         }
 
+        let uploadedAudioUrl = "";
+
+        function toggleAudioInputType(type) {
+            const urlContainer = document.getElementById('audio-input-url-container');
+            const fileContainer = document.getElementById('audio-input-file-container');
+            const btnUrl = document.getElementById('btn-audio-type-url');
+            const btnFile = document.getElementById('btn-audio-type-file');
+            
+            if (type === 'url') {
+                urlContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                btnUrl.classList.add('bg-slate-100', 'font-semibold');
+                btnUrl.classList.remove('border-slate-200');
+                btnFile.classList.remove('bg-slate-100', 'font-semibold');
+                btnFile.classList.add('border-slate-200');
+                uploadedAudioUrl = "";
+            } else {
+                urlContainer.classList.add('hidden');
+                fileContainer.classList.remove('hidden');
+                btnUrl.classList.remove('bg-slate-100', 'font-semibold');
+                btnUrl.classList.add('border-slate-200');
+                btnFile.classList.add('bg-slate-100', 'font-semibold');
+                btnFile.classList.remove('border-slate-200');
+            }
+        }
+
+        async function uploadAudioFile() {
+            const fileInput = document.getElementById('q-audio-file');
+            const statusDiv = document.getElementById('audio-upload-status');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Iltimos fayl tanlang.");
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            statusDiv.innerText = "Yuklanmoqda... ⏳";
+            statusDiv.className = "text-[10px] text-blue-500 mt-1";
+            
+            try {
+                const response = await fetch(`${API_URL}/api/admin/upload-audio`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Fayl yuklashda xatolik.");
+                }
+                
+                const data = await response.json();
+                uploadedAudioUrl = data.url;
+                statusDiv.innerText = "Fayl muvaffaqiyatli yuklandi! ✅";
+                statusDiv.className = "text-[10px] text-emerald-600 mt-1";
+            } catch (err) {
+                console.error(err);
+                statusDiv.innerText = "Xatolik: " + err.message;
+                statusDiv.className = "text-[10px] text-red-500 mt-1";
+                uploadedAudioUrl = "";
+            }
+        }
+
         function toggleQuestionFields() {
             const sec = document.getElementById('q-section').value;
             const readingText = document.getElementById('reading-text-wrapper');
@@ -1006,9 +1093,9 @@
         async function saveQuestion() {
             const section = document.getElementById('q-section').value;
             const part = parseInt(document.getElementById('q-part').value);
-            const title = document.getElementById('q-title').value.trim();
             const text = document.getElementById('q-text').value.trim();
-            const audioUrl = document.getElementById('q-audio-url').value.trim();
+            const audioUrlInput = document.getElementById('q-audio-url').value.trim();
+            const audioUrl = uploadedAudioUrl ? uploadedAudioUrl : audioUrlInput;
             
             if (!title) {
                 alert("Sarlavhani kiriting.");
@@ -1067,6 +1154,12 @@
                     document.getElementById('q-title').value = '';
                     document.getElementById('q-text').value = '';
                     document.getElementById('q-audio-url').value = '';
+                    uploadedAudioUrl = "";
+                    const fileInput = document.getElementById('q-audio-file');
+                    if (fileInput) fileInput.value = "";
+                    const statusDiv = document.getElementById('audio-upload-status');
+                    if (statusDiv) statusDiv.innerText = "";
+                    toggleAudioInputType('url');
                     document.getElementById('questions-builder-container').innerHTML = '';
                     addQuestionRow();
                     loadAdminQuestions();
