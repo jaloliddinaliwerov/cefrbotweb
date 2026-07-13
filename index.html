@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="uz" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEFR Prep Hub - Dashboard & Admin Panel</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            950: '#030712'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-full font-['Outfit'] antialiased">
+    <div class="min-h-full flex flex-col">
+        <!-- Navigation Header -->
+        <header class="sticky top-0 z-40 border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 shadow-lg shadow-brand-500/20">
+                            <i class="fa-solid fa-graduation-cap text-lg text-white"></i>
+                        </div>
+                        <div>
+                            <span class="text-xl font-bold bg-gradient-to-r from-brand-500 to-indigo-400 bg-clip-text text-transparent">CEFR Prep Hub</span>
+                            <span class="hidden sm:inline-block ml-2 rounded-full bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-400">Student & Admin Portal</span>
+                        </div>
+                    </div>
+                    
+                    <nav class="hidden md:flex items-center gap-1">
+                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn active-nav">
+                            <i class="fa-solid fa-chart-line mr-2"></i>Dashboard
+                        </button>
+                        <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="nav-btn">
+                            <i class="fa-solid fa-trophy mr-2"></i>Leaderboard
+                        </button>
+                        <button onclick="switchTab('mock')" id="nav-mock" class="nav-btn">
+                            <i class="fa-solid fa-file-invoice mr-2"></i>Mock Exams
+                        </button>
+                        <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn">
+                            <i class="fa-solid fa-lock mr-2"></i>Admin Panel
+                        </button>
+                    </nav>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="openSettings()" class="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition">
+                            <i class="fa-solid fa-gear text-lg"></i>
+                        </button>
+                        <button class="md:hidden rounded-lg p-2 text-slate-400 hover:bg-slate-800" onclick="toggleMobileMenu()">
+                            <i class="fa-solid fa-bars text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden border-b border-slate-800 bg-slate-900 px-4 py-3 flex flex-col gap-2">
+                <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="mobile-nav-btn"><i class="fa-solid fa-chart-line mr-3"></i>Dashboard</button>
+                <button onclick="switchTab('leaderboard'); toggleMobileMenu()" class="mobile-nav-btn"><i class="fa-solid fa-trophy mr-3"></i>Leaderboard</button>
+                <button onclick="switchTab('mock'); toggleMobileMenu()" class="mobile-nav-btn"><i class="fa-solid fa-file-invoice mr-3"></i>Mock Exams</button>
+                <button onclick="switchTab('admin'); toggleMobileMenu()" class="mobile-nav-btn"><i class="fa-solid fa-lock mr-3"></i>Admin Panel</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            
+            <!-- ====== DASHBOARD TAB ====== -->
+            <section id="tab-dashboard" class="tab-content space-y-8">
+                <!-- User Welcome & Stats Grid -->
+                <div class="glass-card p-6 flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-4 text-center lg:text-left flex-col sm:flex-row">
+                        <div class="h-16 w-16 rounded-full bg-gradient-to-tr from-brand-500 to-indigo-500 flex items-center justify-center text-3xl font-bold shadow-lg" id="user-avatar">
+                            U
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold" id="user-name">Salom, Talaba!</h2>
+                            <p class="text-slate-400 text-sm">Botda yutuqlar qozonib darajangizni oshiring.</p>
+                            <div class="mt-2 flex gap-2 justify-center sm:justify-start">
+                                <span class="bg-indigo-500/20 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full border border-indigo-500/30 flex items-center gap-1">
+                                    <i class="fa-solid fa-fire text-orange-400"></i> <span id="user-streak-badge">0 kun streak</span>
+                                </span>
+                                <span class="bg-amber-500/20 text-amber-300 text-xs px-2.5 py-0.5 rounded-full border border-amber-500/30 flex items-center gap-1">
+                                    <i class="fa-solid fa-bolt text-amber-400"></i> <span id="user-xp-badge">0 XP</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Search user profile input -->
+                    <div class="w-full max-w-xs flex gap-2">
+                        <input type="number" id="stats-tg-id" placeholder="Telegram ID kiriting..." class="input-field text-sm py-2">
+                        <button onclick="loadStatsByInput()" class="btn-primary py-2 px-4 whitespace-nowrap text-sm"><i class="fa-solid fa-search mr-1.5"></i>Ko'rish</button>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Bajarilgan Testlar</span>
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                        </div>
+                        <div class="stat-val" id="stat-tests">0 ta</div>
+                        <div class="stat-sub">Reading & Listening</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">O'rtacha Ball</span>
+                            <i class="fa-solid fa-percentage text-brand-400"></i>
+                        </div>
+                        <div class="stat-val" id="stat-avg-test">0%</div>
+                        <div class="stat-sub">To'g'rilik ko'rsatkichi</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Writing Topshiriqlar</span>
+                            <i class="fa-solid fa-pen-nib text-indigo-400"></i>
+                        </div>
+                        <div class="stat-val" id="stat-writings">0 ta</div>
+                        <div class="stat-sub" id="stat-avg-writing">O'rtacha: 0/100</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Speaking Topshiriqlar</span>
+                            <i class="fa-solid fa-microphone text-rose-400"></i>
+                        </div>
+                        <div class="stat-val" id="stat-speakings">0 ta</div>
+                        <div class="stat-sub" id="stat-avg-speaking">O'rtacha: 0/100</div>
+                    </div>
+                </div>
+
+                <!-- Charts & Progress -->
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    <div class="glass-card p-6 lg:col-span-2">
+                        <h3 class="text-lg font-semibold mb-4"><i class="fa-solid fa-chart-simple mr-2 text-brand-500"></i>Rivojlanish statistikasi</h3>
+                        <div class="h-64">
+                            <canvas id="progressChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card p-6">
+                        <h3 class="text-lg font-semibold mb-4"><i class="fa-solid fa-award mr-2 text-amber-500"></i>Yutuqlar (Achievements)</h3>
+                        <div class="space-y-4 max-h-[16rem] overflow-y-auto pr-2" id="achievements-list">
+                            <!-- Populated dynamically -->
+                            <p class="text-slate-400 text-sm italic">Yuklanmoqda...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== LEADERBOARD TAB ====== -->
+            <section id="tab-leaderboard" class="tab-content hidden space-y-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>Peshqadamlar Jadvali</h2>
+                        <p class="text-slate-400 text-sm">Eng ko'p XP to'plagan top 20 talaba ro'yxati</p>
+                    </div>
+                    <button onclick="loadLeaderboard()" class="btn-secondary py-2 px-3 text-xs"><i class="fa-solid fa-rotate mr-1"></i>Yangilash</button>
+                </div>
+                
+                <div class="glass-card overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse text-left text-sm">
+                            <thead class="bg-slate-900/50 border-b border-slate-800 text-slate-300">
+                                <tr>
+                                    <th class="p-4 font-semibold">O'rin</th>
+                                    <th class="p-4 font-semibold">Foydalanuvchi</th>
+                                    <th class="p-4 font-semibold text-center">Streak 🔥</th>
+                                    <th class="p-4 font-semibold text-right">Jami XP ⚡️</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-850" id="leaderboard-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== MOCK EXAMS TAB ====== -->
+            <section id="tab-mock" class="tab-content hidden space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold"><i class="fa-solid fa-file-invoice text-indigo-500 mr-2"></i>Mock Imtihonlar do'koni</h2>
+                    <p class="text-slate-400 text-sm">Haqiqiy CEFR darajangizni aniqlash uchun imtihonlarni sotib oling va topshiring.</p>
+                </div>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" id="mock-list-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- ====== ADMIN PANEL TAB ====== -->
+            <section id="tab-admin" class="tab-content hidden space-y-8">
+                <!-- Login Box -->
+                <div id="admin-login-box" class="max-w-md mx-auto glass-card p-6 space-y-4">
+                    <div class="text-center">
+                        <div class="h-12 w-12 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center mx-auto text-xl mb-3">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Admin Tizimiga Kirish</h3>
+                        <p class="text-slate-400 text-xs mt-1">Telegramda `/admin` buyrug'i orqali token oling.</p>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="text-xs font-semibold text-slate-400 uppercase">Admin Kirish Tokeni</label>
+                        <input type="password" id="admin-token-input" placeholder="Tokenni bu yerga kiriting..." class="input-field">
+                    </div>
+                    
+                    <button onclick="loginAdmin()" class="w-full btn-primary py-2.5">Tizimga Kirish</button>
+                </div>
+
+                <!-- Admin Dashboard (Hidden initially) -->
+                <div id="admin-dashboard" class="hidden space-y-8">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                        <div>
+                            <h2 class="text-2xl font-bold text-red-400"><i class="fa-solid fa-lock-open mr-2"></i>Admin Dashboard</h2>
+                            <p class="text-slate-400 text-sm">Savollar, insholar va mock imtihonlarni boshqarish paneli</p>
+                        </div>
+                        <button onclick="logoutAdmin()" class="btn-secondary bg-red-950/30 border-red-900/50 hover:bg-red-900/30 text-red-300 py-2 px-4 text-sm">Chiqish</button>
+                    </div>
+
+                    <!-- Inner Tabs -->
+                    <div class="flex border-b border-slate-800 gap-2 overflow-x-auto pb-px">
+                        <button onclick="switchAdminSubTab('questions')" id="admin-sub-nav-questions" class="admin-sub-btn active-admin-sub">
+                            <i class="fa-solid fa-book-open mr-1.5"></i>Reading / Listening
+                        </button>
+                        <button onclick="switchAdminSubTab('writing')" id="admin-sub-nav-writing" class="admin-sub-btn">
+                            <i class="fa-solid fa-file-pen mr-1.5"></i>Writing / Speaking Tasks
+                        </button>
+                        <button onclick="switchAdminSubTab('mocks')" id="admin-sub-nav-mocks" class="admin-sub-btn">
+                            <i class="fa-solid fa-file-shield mr-1.5"></i>Mock Exams Builder
+                        </button>
+                    </div>
+
+                    <!-- 1. Reading / Listening Manager -->
+                    <div id="admin-sub-questions" class="admin-sub-content space-y-6">
+                        <!-- Add Form -->
+                        <div class="glass-card p-6 space-y-6">
+                            <h3 class="text-lg font-bold"><i class="fa-solid fa-plus-circle text-brand-400 mr-2"></i>Yangi Test Qo'shish</h3>
+                            
+                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Bo'lim</label>
+                                    <select id="q-section" onchange="toggleQuestionFields()" class="input-field">
+                                        <option value="reading">Reading</option>
+                                        <option value="listening">Listening</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Part (1-5)</label>
+                                    <input type="number" id="q-part" min="1" max="5" value="1" class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Mavzu Sarlavhasi</label>
+                                    <input type="text" id="q-title" placeholder="Masalan: Computer History" class="input-field">
+                                </div>
+                            </div>
+
+                            <div id="reading-text-wrapper">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Matn (Faqat Reading uchun)</label>
+                                <textarea id="q-text" rows="5" placeholder="Reading matnini bu yerga yozing..." class="input-field"></textarea>
+                            </div>
+
+                            <div id="listening-audio-wrapper" class="hidden">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Audio URL (Faqat Listening uchun)</label>
+                                <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="input-field">
+                            </div>
+
+                            <!-- Dynamic Questions Builder -->
+                            <div class="space-y-4 border-t border-slate-800/80 pt-5">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-sm font-bold uppercase text-slate-400">Savollar ro'yxati</h4>
+                                    <button onclick="addQuestionRow()" class="btn-secondary py-1 px-3 text-xs"><i class="fa-solid fa-plus mr-1"></i>Savol qo'shish</button>
+                                </div>
+                                <div id="questions-builder-container" class="space-y-4">
+                                    <!-- Dynamic rows go here -->
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end gap-3 border-t border-slate-800/80 pt-5">
+                                <button onclick="saveQuestion()" class="btn-primary py-2 px-6">Saqlash</button>
+                            </div>
+                        </div>
+
+                        <!-- Current Questions List -->
+                        <div class="glass-card p-6">
+                            <h3 class="text-lg font-bold mb-4">Mavjud Testlar Ro'yxati</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead>
+                                        <tr class="bg-slate-900 border-b border-slate-800 text-slate-350">
+                                            <th class="p-3">ID</th>
+                                            <th class="p-3">Bo'lim</th>
+                                            <th class="p-3">Part</th>
+                                            <th class="p-3">Sarlavha</th>
+                                            <th class="p-3 text-center">Savollar soni</th>
+                                            <th class="p-3 text-right">Amal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-questions-tbody">
+                                        <!-- Dynamically listed -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Writing / Speaking Task Manager -->
+                    <div id="admin-sub-writing" class="admin-sub-content hidden space-y-6">
+                        <!-- Add Form -->
+                        <div class="glass-card p-6 space-y-5">
+                            <h3 class="text-lg font-bold"><i class="fa-solid fa-plus-circle text-indigo-400 mr-2"></i>Yangi Writing / Speaking Topshiriq</h3>
+                            
+                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Topshiriq Turi</label>
+                                    <select id="task-type" onchange="toggleTaskFields()" class="input-field">
+                                        <option value="writing">Writing Task</option>
+                                        <option value="speaking">Speaking Task</option>
+                                    </select>
+                                </div>
+                                <div id="speaking-part-wrapper" class="hidden">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Part (1, 2 yoki 3)</label>
+                                    <input type="number" id="task-part" min="1" max="3" value="1" class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Daraja (Level)</label>
+                                    <select id="task-level" class="input-field">
+                                        <option value="B1">B1</option>
+                                        <option value="B2">B2</option>
+                                        <option value="C1">C1</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Sarlavha</label>
+                                    <input type="text" id="task-title" placeholder="Mavzu sarlavhasi..." class="input-field">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Mavzu Tavsifi (Prompt)</label>
+                                <textarea id="task-prompt" rows="4" placeholder="Topshiriq mavzusini to'liq yozing..." class="input-field"></textarea>
+                            </div>
+                            
+                            <div class="flex justify-end border-t border-slate-800 pt-4">
+                                <button onclick="saveTask()" class="btn-primary py-2 px-6">Topshiriqni Saqlash</button>
+                            </div>
+                        </div>
+
+                        <!-- Tasks List -->
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="glass-card p-6">
+                                <h3 class="text-md font-bold mb-3">Writing Topshiriqlari</h3>
+                                <div class="overflow-y-auto max-h-96 pr-2">
+                                    <ul id="admin-writings-ul" class="space-y-3"></ul>
+                                </div>
+                            </div>
+                            <div class="glass-card p-6">
+                                <h3 class="text-md font-bold mb-3">Speaking Topshiriqlari</h3>
+                                <div class="overflow-y-auto max-h-96 pr-2">
+                                    <ul id="admin-speakings-ul" class="space-y-3"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Mock Exam Manager -->
+                    <div id="admin-sub-mocks" class="admin-sub-content hidden space-y-6">
+                        <!-- Add Form -->
+                        <div class="glass-card p-6 space-y-5">
+                            <h3 class="text-lg font-bold"><i class="fa-solid fa-shield-halved text-brand-400 mr-2"></i>Yangi Mock Imtihonini Yig'ish</h3>
+                            
+                            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Mock Exam nomi</label>
+                                    <input type="text" id="mock-title" placeholder="Masalan: CEFR Mock #2" class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Narxi (UZS)</label>
+                                    <input type="number" id="mock-price" value="30000" class="input-field">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">1. Reading / Listening Savollarni tanlang</label>
+                                    <div class="border border-slate-800 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2" id="mock-questions-picker">
+                                        <!-- dynamic -->
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">2. Writing Topshiriqni tanlang</label>
+                                    <div class="border border-slate-800 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2" id="mock-writings-picker">
+                                        <!-- dynamic -->
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">3. Speaking Topshiriqni tanlang</label>
+                                    <div class="border border-slate-800 rounded-lg p-3 max-h-48 overflow-y-auto space-y-2" id="mock-speakings-picker">
+                                        <!-- dynamic -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end border-t border-slate-800 pt-4">
+                                <button onclick="saveMockExam()" class="btn-primary py-2 px-6">Mock Imtihonni Saqlash</button>
+                            </div>
+                        </div>
+
+                        <!-- Current Mock Exams -->
+                        <div class="glass-card p-6">
+                            <h3 class="text-lg font-bold mb-4">Mavjud Mock Examlar Ro'yxati</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead>
+                                        <tr class="bg-slate-900 border-b border-slate-800 text-slate-350">
+                                            <th class="p-3">ID</th>
+                                            <th class="p-3">Sarlavha</th>
+                                            <th class="p-3">Narxi</th>
+                                            <th class="p-3">Reading/Listening soni</th>
+                                            <th class="p-3">Writing soni</th>
+                                            <th class="p-3">Speaking soni</th>
+                                            <th class="p-3 text-right">Amal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-mocks-tbody">
+                                        <!-- Dynamic list -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs text-slate-500">
+            <p>© 2026 CEFR Prep Bot & Web App. Hamma huquqlar himoyalangan.</p>
+        </footer>
+    </div>
+
+    <!-- Global API Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden">
+        <div class="glass-card w-full max-w-sm p-6 space-y-4">
+            <h3 class="text-lg font-bold"><i class="fa-solid fa-gear mr-2 text-slate-400"></i>Tizim Sozlamalari</h3>
+            
+            <div class="space-y-2">
+                <label class="text-xs font-semibold text-slate-400 uppercase">Backend API Manzili (URL)</label>
+                <input type="text" id="api-url-input" placeholder="https://example.railway.app" class="input-field text-sm">
+                <p class="text-[10px] text-slate-400">Agarda Vercel alohida domenda bo'lsa, Railway URL manzilingizni yozib qo'ying.</p>
+            </div>
+            
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeSettings()" class="btn-secondary py-1.5 px-3 text-xs">Bekor qilish</button>
+                <button onclick="saveSettings()" class="btn-primary py-1.5 px-4 text-xs">Saqlash</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
