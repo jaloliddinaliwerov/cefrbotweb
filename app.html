@@ -2,91 +2,151 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEFR App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CEFR Test Platformasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { background-color: var(--tg-theme-bg-color, #ffffff); color: var(--tg-theme-text-color, #000000); font-family: 'Inter', sans-serif; }
-        .secondary-bg { background-color: var(--tg-theme-secondary-bg-color, #f3f4f6); }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="p-4 flex flex-col h-screen">
+<body class="text-gray-800">
 
-    {% if view == 'test' %}
-        <div class="text-xl font-bold mb-4 border-b pb-2">📖 {{ section | capitalize }} - Part {{ part }}</div>
-        <div class="flex-1 overflow-y-auto mb-4 secondary-bg p-4 rounded-lg shadow-inner text-sm leading-relaxed">{{ data.text }}</div>
-        <div class="flex-1 overflow-y-auto pb-6" id="questions-container">
-            {% for question in data.questions %}
-            <div class="mb-6">
-                <p class="font-semibold mb-3">{{ question.id }}. {{ question.q }}</p>
-                <div class="space-y-2">
-                    {% for option in question.options %}
-                    <label class="flex items-center space-x-3 p-3 border rounded-xl hover:bg-gray-100 cursor-pointer transition">
-                        <input type="radio" name="q_{{ question.id }}" value="{{ option }}" class="form-radio h-5 w-5 text-blue-600">
-                        <span>{{ option }}</span>
-                    </label>
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white p-4 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">CEFR / SAT Platform</h1>
+            <a href="/" class="hover:underline">Bosh Sahifa</a>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto mt-8 p-4">
+        
+        <!-- BOSH SAHIFA -->
+        {% if view == 'home' %}
+            <div class="bg-white p-8 rounded-xl shadow-sm text-center">
+                <h2 class="text-3xl font-bold mb-4">Ingliz tilini biz bilan o'rganing!</h2>
+                <p class="text-gray-600 mb-8">Reading va Listening qobiliyatlaringizni oshirish uchun testlarni boshlang.</p>
+                <a href="/test/reading/1" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                    Reading Part 1 ni boshlash
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- TEST ISHLASH SAHIFASI -->
+        {% if view == 'test' %}
+            <div id="test-container" class="bg-white p-6 rounded-xl shadow-sm">
+                <div class="text-2xl font-bold mb-6 border-b pb-4">
+                    📖 {{ section | capitalize }} - Part {{ part }}
+                </div>
+
+                <!-- Matn -->
+                <div class="bg-gray-50 p-6 rounded-lg border text-base leading-relaxed mb-8">
+                    {{ data.text }}
+                </div>
+
+                <!-- Savollar -->
+                <div id="questions-container">
+                    {% for question in data.questions %}
+                    <div class="mb-8">
+                        <p class="font-semibold text-lg mb-4">{{ question.id }}. {{ question.q }}</p>
+                        <div class="space-y-3">
+                            {% for option in question.options %}
+                            <label class="flex items-center space-x-3 p-4 border rounded-xl hover:bg-blue-50 cursor-pointer transition">
+                                <input type="radio" name="q_{{ question.id }}" value="{{ option }}" class="form-radio h-5 w-5 text-blue-600">
+                                <span class="text-gray-700">{{ option }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
+
+                <!-- Yuborish Tugmasi -->
+                <button id="submit-btn" class="w-full bg-blue-600 text-white font-bold text-lg py-4 rounded-xl hover:bg-blue-700 transition shadow-md">
+                    Javoblarni Yuborish
+                </button>
             </div>
-            {% endfor %}
-        </div>
-    {% endif %}
 
-    {% if view == 'admin' %}
-        <div class="text-2xl font-bold mb-6 border-b pb-2">📝 Yangi Material</div>
-        <div class="space-y-5 overflow-y-auto flex-1 pb-6">
-            <div>
-                <label class="block mb-2 font-medium">Bo'lim</label>
-                <select id="section" class="w-full p-3 rounded-xl border secondary-bg outline-none">
-                    <option value="reading">📖 Reading</option>
-                    <option value="listening">🎧 Listening</option>
-                </select>
+            <!-- Natija Ekrani (Boshida yashirin turadi) -->
+            <div id="result-container" class="hidden bg-white p-10 rounded-xl shadow-sm text-center mt-6">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-3xl font-bold mb-2">Test Yakunlandi!</h2>
+                <p class="text-gray-600 text-lg mb-6">Sizning natijangiz quyidagicha:</p>
+                
+                <div class="flex justify-center space-x-8 mb-8">
+                    <div class="p-4 bg-blue-50 rounded-lg">
+                        <p class="text-sm text-gray-500 uppercase tracking-wide">To'g'ri javoblar</p>
+                        <p class="text-3xl font-bold text-blue-600"><span id="score-val">0</span> / <span id="total-val">0</span></p>
+                    </div>
+                    <div class="p-4 bg-green-50 rounded-lg">
+                        <p class="text-sm text-gray-500 uppercase tracking-wide">Foiz</p>
+                        <p class="text-3xl font-bold text-green-600"><span id="percent-val">0</span>%</p>
+                    </div>
+                </div>
+
+                <a href="/" class="inline-block bg-gray-800 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-900 transition">
+                    Bosh sahifaga qaytish
+                </a>
             </div>
-            <div>
-                <label class="block mb-2 font-medium">Matn</label>
-                <textarea id="content" rows="6" class="w-full p-3 rounded-xl border secondary-bg outline-none" placeholder="Matnni kiriting..."></textarea>
-            </div>
-        </div>
-    {% endif %}
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        const viewMode = "{{ view }}"; 
+            <!-- JavaScript Mantiqi -->
+            <script>
+                document.getElementById('submit-btn').addEventListener('click', () => {
+                    let answers = {};
+                    let allAnswered = true;
+                    
+                    const questionIds = [{% for question in data.questions %} "{{ question.id }}", {% endfor %}];
 
-        if (viewMode === 'test') {
-            tg.MainButton.text = "Javoblarni Yuborish";
-            tg.MainButton.show();
-            tg.MainButton.onClick(() => {
-                let answers = {};
-                let allAnswered = true;
-                const questionIds = [{% for question in data.questions %} "{{ question.id }}", {% endfor %}];
+                    questionIds.forEach(id => {
+                        let selected = document.querySelector(`input[name="q_${id}"]:checked`);
+                        if (selected) {
+                            answers[id] = selected.value;
+                        } else {
+                            allAnswered = false;
+                        }
+                    });
 
-                questionIds.forEach(id => {
-                    let selected = document.querySelector(`input[name="q_${id}"]:checked`);
-                    if (selected) answers[id] = selected.value; else allAnswered = false;
+                    if (!allAnswered) {
+                        alert("Iltimos, barcha savollarga javob bering!");
+                        return;
+                    }
+
+                    // Tugmani o'chirish (ikki marta bosmaslik uchun)
+                    document.getElementById('submit-btn').innerText = "Tekshirilmoqda...";
+                    document.getElementById('submit-btn').disabled = true;
+
+                    // Serverga (FastAPI) jo'natish
+                    fetch('/api/submit_test', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            section: "{{ section }}", 
+                            part: "{{ part }}", 
+                            answers: answers 
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.status === "success") {
+                            // Test oynasini yashirib, Natija oynasini ko'rsatish
+                            document.getElementById('test-container').classList.add('hidden');
+                            document.getElementById('result-container').classList.remove('hidden');
+                            
+                            // Ballarni yozish
+                            document.getElementById('score-val').innerText = data.score;
+                            document.getElementById('total-val').innerText = data.total;
+                            document.getElementById('percent-val').innerText = data.percentage;
+                        }
+                    })
+                    .catch(error => {
+                        alert("Tarmoqda xatolik yuz berdi. Qaytadan urinib ko'ring.");
+                        document.getElementById('submit-btn').innerText = "Javoblarni Yuborish";
+                        document.getElementById('submit-btn').disabled = false;
+                    });
                 });
+            </script>
+        {% endif %}
+    </main>
 
-                if (!allAnswered) return tg.showAlert("Barcha savollarga javob bering!");
-
-                fetch('/api/submit_test', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: tg.initDataUnsafe?.user?.id || 0, section: "{{ section }}", part: "{{ part }}", answers: answers })
-                }).then(() => tg.close()).catch(() => tg.showAlert("Xatolik yuz berdi."));
-            });
-
-        } else if (viewMode === 'admin') {
-            tg.MainButton.text = "Bazaga Saqlash";
-            tg.MainButton.show();
-            tg.MainButton.onClick(() => {
-                const section = document.getElementById('section').value;
-                const content = document.getElementById('content').value;
-                if(content.trim() === "") return tg.showAlert("Matn majburiy!");
-                tg.sendData(JSON.stringify({ section: section, content: content })); 
-            });
-        }
-    </script>
 </body>
 </html>
