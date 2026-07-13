@@ -850,7 +850,7 @@
                         <tr class="hover:bg-slate-50/50 transition">
                             <td class="p-4">${rank_display}</td>
                             <td class="p-4 font-semibold text-slate-800">${user.first_name || 'Foydalanuvchi'}</td>
-                            <td class="p-4 text-center text-orange-500 font-semibold">${user.streak || 0} 🔥</td>
+                            <td class="p-4 text-center text-orange-500 font-semibold">${user.streak || 0} <i class="fa-solid fa-fire text-orange-500 ml-1"></i></td>
                             <td class="p-4 text-right font-bold text-blue-600">${user.xp} XP</td>
                         </tr>
                     `;
@@ -1031,7 +1031,7 @@
             const formData = new FormData();
             formData.append('file', file);
             
-            statusDiv.innerText = "Yuklanmoqda... ⏳";
+            statusDiv.innerText = "Yuklanmoqda... <i class="fa-solid fa-spinner fa-spin text-blue-500 ml-1"></i>";
             statusDiv.className = "text-[10px] text-blue-500 mt-1";
             
             try {
@@ -1050,7 +1050,7 @@
                 
                 const data = await response.json();
                 uploadedAudioUrl = data.url;
-                statusDiv.innerText = "Fayl muvaffaqiyatli yuklandi! ✅";
+                statusDiv.innerText = "Fayl muvaffaqiyatli yuklandi! <i class="fa-solid fa-circle-check text-emerald-500 ml-1"></i>";
                 statusDiv.className = "text-[10px] text-emerald-600 mt-1";
             } catch (err) {
                 console.error(err);
