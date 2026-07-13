@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CEFR Prep Hub — Student & Admin Portal</title>
+    <title>CEFR Prep Hub — Admin Portal</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -23,8 +23,6 @@
             }
         }
     </script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts: Inter -->
@@ -124,21 +122,6 @@
             border-color: #86868b;
         }
 
-        /* Badge badges */
-        .badge-card {
-            border-radius: 1.25rem;
-            transition: all 0.3s ease;
-            background: #ffffff;
-        }
-        .badge-card.unlocked {
-            border: 1px solid rgba(52, 199, 89, 0.25);
-            background: rgba(52, 199, 89, 0.02);
-        }
-        .badge-card.locked {
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            opacity: 0.5;
-        }
-
         /* Custom scroll */
         ::-webkit-scrollbar {
             width: 8px;
@@ -165,436 +148,269 @@
                 <div class="flex h-16 items-center justify-between">
                     <!-- Brand -->
                     <div class="flex items-center gap-3">
-                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0071e3] shadow-sm">
-                            <i class="fa-solid fa-graduation-cap text-md text-white"></i>
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500 shadow-sm">
+                            <i class="fa-solid fa-shield-halved text-md text-white"></i>
                         </div>
                         <div>
-                            <span class="text-md font-bold tracking-tight text-[#1d1d1f]">CEFR Prep Hub</span>
+                            <span class="text-md font-bold tracking-tight text-[#1d1d1f]">CEFR Prep Hub Admin</span>
                         </div>
                     </div>
                     
-                    <!-- Navigation (Segmented Control style) -->
-                    <nav class="hidden md:flex items-center segmented-control">
-                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="segmented-btn active px-4 py-1.5 text-xs font-semibold">
-                            Dashboard
-                        </button>
-                        <button onclick="switchTab('leaderboard')" id="nav-leaderboard" class="segmented-btn px-4 py-1.5 text-xs font-semibold">
-                            Leaderboard
-                        </button>
-                        <button onclick="switchTab('mock')" id="nav-mock" class="segmented-btn px-4 py-1.5 text-xs font-semibold">
-                            Mock Exams
-                        </button>
-                        <button onclick="switchTab('admin')" id="nav-admin" class="segmented-btn px-4 py-1.5 text-xs font-semibold">
-                            Admin Panel
-                        </button>
-                    </nav>
-
-                    <!-- Settings and Mobile Toggle -->
+                    <!-- Settings Button -->
                     <div class="flex items-center gap-2">
                         <button onclick="openSettings()" class="rounded-xl p-2 bg-slate-100 hover:bg-slate-200 text-slate-650 transition">
                             <i class="fa-solid fa-gear text-sm"></i>
                         </button>
-                        <button class="md:hidden rounded-xl p-2 bg-slate-100 hover:bg-slate-200" onclick="toggleMobileMenu()">
-                            <i class="fa-solid fa-bars text-sm"></i>
-                        </button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden border-t border-black/5 bg-white px-4 py-4 flex flex-col gap-2">
-                <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-chart-line mr-3 text-blue-500"></i>Dashboard</button>
-                <button onclick="switchTab('leaderboard'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-trophy mr-3 text-amber-500"></i>Leaderboard</button>
-                <button onclick="switchTab('mock'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-file-invoice mr-3 text-indigo-500"></i>Mock Exams</button>
-                <button onclick="switchTab('admin'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-lock mr-3 text-red-500"></i>Admin Panel</button>
             </div>
         </header>
 
         <!-- Main Body -->
         <main class="flex-1 mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
             
-            <!-- ====== DASHBOARD TAB ====== -->
-            <section id="tab-dashboard" class="tab-content space-y-8">
-                <!-- Apple User Banner -->
-                <div class="apple-card p-6 sm:p-8 flex flex-col lg:flex-row items-center justify-between gap-6 bg-gradient-to-br from-white to-[#fafafa]">
-                    <div class="flex items-center gap-5 text-center lg:text-left flex-col sm:flex-row">
-                        <div class="h-16 w-16 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-2xl font-bold shadow-sm text-white" id="user-avatar">
-                            U
-                        </div>
-                        <div class="space-y-1">
-                            <h2 class="text-2xl font-bold tracking-tight text-slate-900" id="user-name">Salom, Talaba!</h2>
-                            <p class="text-slate-500 text-xs font-normal">Tizim orqali o'quv ko'rsatkichlaringizni kuzatib boring.</p>
-                            <div class="pt-1 flex gap-2 justify-center lg:justify-start">
-                                <span class="bg-orange-50 text-orange-600 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border border-orange-200 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-fire"></i> <span id="user-streak-badge">0 Kun streak</span>
-                                </span>
-                                <span class="bg-blue-50 text-blue-600 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border border-blue-200 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-bolt"></i> <span id="user-xp-badge">0 XP</span>
-                                </span>
-                            </div>
-                        </div>
+            <!-- Login Box -->
+            <section id="admin-login-box" class="max-w-md mx-auto apple-card p-6 sm:p-8 space-y-5">
+                <div class="text-center">
+                    <div class="h-12 w-12 rounded-2xl bg-red-50 text-red-500 border border-red-200 flex items-center justify-center mx-auto text-xl mb-3">
+                        <i class="fa-solid fa-shield-halved"></i>
                     </div>
-                    
-                    <!-- Search Widget -->
-                    <div class="w-full max-w-xs flex gap-2">
-                        <input type="number" id="stats-tg-id" placeholder="Telegram ID kiritish..." class="apple-input text-xs w-full">
-                        <button onclick="loadStatsByInput()" class="apple-btn-primary py-2 px-4 whitespace-nowrap text-xs flex items-center gap-1.5"><i class="fa-solid fa-search"></i>Ko'rish</button>
-                    </div>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="apple-card p-5 relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Bajarilgan Testlar</span>
-                            <div class="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
-                                <i class="fa-solid fa-square-poll-vertical text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-tests">0 ta</div>
-                        <div class="text-slate-500 text-[10px] mt-1">Reading & Listening</div>
-                    </div>
-                    <div class="apple-card p-5 relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">O'rtacha Foiz</span>
-                            <div class="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center">
-                                <i class="fa-solid fa-percent text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-avg-test">0%</div>
-                        <div class="text-slate-500 text-[10px] mt-1">To'g'ri javoblar ko'rsatkichi</div>
-                    </div>
-                    <div class="apple-card p-5 relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Writing topshiriqlar</span>
-                            <div class="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center">
-                                <i class="fa-solid fa-pen-fancy text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-writings">0 ta</div>
-                        <div class="text-slate-500 text-[10px] mt-1 text-slate-400" id="stat-avg-writing">O'rtacha: 0/100 ball</div>
-                    </div>
-                    <div class="apple-card p-5 relative overflow-hidden group">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Speaking topshiriqlar</span>
-                            <div class="h-8 w-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center">
-                                <i class="fa-solid fa-waveform text-xs"></i>
-                            </div>
-                        </div>
-                        <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-speakings">0 ta</div>
-                        <div class="text-slate-500 text-[10px] mt-1 text-slate-400" id="stat-avg-speaking">O'rtacha: 0/100 ball</div>
-                    </div>
-                </div>
-
-                <!-- Charts & Badges -->
-                <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    <!-- Progress Bar Chart -->
-                    <div class="apple-card p-6 lg:col-span-2 flex flex-col justify-between min-h-[350px]">
-                        <div>
-                            <h3 class="text-sm font-bold tracking-tight text-slate-800"><i class="fa-solid fa-chart-line mr-2 text-blue-500"></i>O'quv ko'rsatkichlari grafikasi</h3>
-                            <p class="text-slate-450 text-[11px]">Reading, Listening, Writing va Speaking bo'limlarining o'rtacha natijasi</p>
-                        </div>
-                        <div class="h-64 mt-4 relative">
-                            <canvas id="progressChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <!-- Achievements Panel -->
-                    <div class="apple-card p-6 flex flex-col justify-between min-h-[350px]">
-                        <div>
-                            <h3 class="text-sm font-bold tracking-tight text-slate-800"><i class="fa-solid fa-award mr-2 text-amber-500"></i>Yutuqlar va Unvonlar</h3>
-                            <p class="text-slate-450 text-[11px] mb-4">Talabaning yutuq kartalari</p>
-                        </div>
-                        <div class="space-y-3 flex-1 overflow-y-auto pr-1" id="achievements-list">
-                            <p class="text-slate-400 text-xs italic">Statistika yuklanganda yutuqlar ko'rsatiladi...</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ====== LEADERBOARD TAB ====== -->
-            <section id="tab-leaderboard" class="tab-content hidden space-y-6">
-                <div class="flex items-center justify-between border-b border-black/5 pb-4">
-                    <div>
-                        <h2 class="text-2xl font-bold tracking-tight text-slate-900"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>Peshqadamlar Jadvali</h2>
-                        <p class="text-slate-500 text-xs">Jami to'plangan XP bo'yicha TOP 20 nafar talaba</p>
-                    </div>
-                    <button onclick="loadLeaderboard()" class="apple-btn-secondary py-2 px-3.5 text-xs flex items-center gap-1.5"><i class="fa-solid fa-rotate-right text-[10px]"></i>Yangilash</button>
+                    <h3 class="text-xl font-bold tracking-tight text-slate-900">Admin Panelga Kirish</h3>
+                    <p class="text-slate-450 text-xs mt-1">Tokenni kiriting va boshqaruvni yoqing.</p>
                 </div>
                 
-                <div class="apple-card overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200/60 text-slate-600">
-                                    <th class="p-4 text-xs font-bold uppercase tracking-wider">O'rin</th>
-                                    <th class="p-4 text-xs font-bold uppercase tracking-wider">Foydalanuvchi nomi</th>
-                                    <th class="p-4 text-xs font-bold uppercase tracking-wider text-center">Streak 🔥</th>
-                                    <th class="p-4 text-xs font-bold uppercase tracking-wider text-right">To'plangan XP</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100" id="leaderboard-body">
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-555 uppercase tracking-wider">Xavfsizlik kaliti (Token)</label>
+                    <input type="password" id="admin-token-input" placeholder="Token kalitini kiriting..." class="apple-input text-xs w-full">
                 </div>
+                
+                <button onclick="loginAdmin()" class="w-full apple-btn-primary py-2.5 text-xs font-semibold">Tizimga kirish</button>
             </section>
 
-            <!-- ====== MOCK EXAMS TAB ====== -->
-            <section id="tab-mock" class="tab-content hidden space-y-6">
-                <div class="border-b border-black/5 pb-4">
-                    <h2 class="text-2xl font-bold tracking-tight text-slate-900"><i class="fa-solid fa-file-invoice text-indigo-500 mr-2"></i>Mock Imtihonlari</h2>
-                    <p class="text-slate-500 text-xs">Loyiha doirasida taqdim etiladigan rasmiy CEFR Mock sinovlari.</p>
-                </div>
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" id="mock-list-grid">
-                </div>
-            </section>
-
-            <!-- ====== ADMIN PANEL TAB ====== -->
-            <section id="tab-admin" class="tab-content hidden space-y-8">
-                <!-- Login Box -->
-                <div id="admin-login-box" class="max-w-md mx-auto apple-card p-6 sm:p-8 space-y-5">
-                    <div class="text-center">
-                        <div class="h-12 w-12 rounded-2xl bg-red-50 text-red-500 border border-red-200 flex items-center justify-center mx-auto text-xl mb-3">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
-                        <h3 class="text-xl font-bold tracking-tight text-slate-900">Admin Panelga Kirish</h3>
-                        <p class="text-slate-400 text-xs mt-1">Tokenni kiriting va boshqaruvni yoqing.</p>
+            <!-- Admin Dashboard (Hidden initially) -->
+            <section id="admin-dashboard" class="hidden space-y-8">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 tracking-tight"><i class="fa-solid fa-lock-open mr-2 text-blue-500"></i>Admin Dashboard</h2>
+                        <p class="text-slate-555 text-xs">Savollar, insholar va mock imtihonlarni boshqarish</p>
                     </div>
-                    
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">Xavfsizlik kaliti (Token)</label>
-                        <input type="password" id="admin-token-input" placeholder="Token kalitini kiriting..." class="apple-input text-xs w-full">
-                    </div>
-                    
-                    <button onclick="loginAdmin()" class="w-full apple-btn-primary py-2.5 text-xs font-semibold">Tizimga kirish</button>
+                    <button onclick="logoutAdmin()" class="apple-btn-secondary bg-red-50 border-red-200 hover:bg-red-100 text-red-600 py-2 px-4 text-xs font-semibold">Tizimdan chiqish</button>
                 </div>
 
-                <!-- Admin Dashboard (Hidden initially) -->
-                <div id="admin-dashboard" class="hidden space-y-8">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-                        <div>
-                            <h2 class="text-2xl font-bold text-slate-800 tracking-tight"><i class="fa-solid fa-lock-open mr-2 text-blue-500"></i>Admin Dashboard</h2>
-                            <p class="text-slate-500 text-xs">Savollar, insholar va mock imtihonlarni boshqarish</p>
-                        </div>
-                        <button onclick="logoutAdmin()" class="apple-btn-secondary bg-red-50 border-red-200 hover:bg-red-100 text-red-600 py-2 px-4 text-xs font-semibold">Tizimdan chiqish</button>
-                    </div>
+                <!-- Inner sub-navigation (Segmented Control) -->
+                <div class="flex segmented-control w-full sm:w-max mb-6">
+                    <button onclick="switchAdminSubTab('questions')" id="admin-sub-nav-questions" class="segmented-btn active px-4 py-1.5 text-xs font-semibold flex-1 sm:flex-none">
+                        <i class="fa-solid fa-book-open mr-1.5"></i>Reading & Listening
+                    </button>
+                    <button onclick="switchAdminSubTab('writing')" id="admin-sub-nav-writing" class="segmented-btn px-4 py-1.5 text-xs font-semibold flex-1 sm:flex-none">
+                        <i class="fa-solid fa-file-signature mr-1.5"></i>Writing & Speaking Tasks
+                    </button>
+                    <button onclick="switchAdminSubTab('mocks')" id="admin-sub-nav-mocks" class="segmented-btn px-4 py-1.5 text-xs font-semibold flex-1 sm:flex-none">
+                        <i class="fa-solid fa-layer-group mr-1.5"></i>Mock Exams Builder
+                    </button>
+                </div>
 
-                    <!-- Inner sub-navigation -->
-                    <div class="flex border-b border-slate-200 gap-2 overflow-x-auto pb-px">
-                        <button onclick="switchAdminSubTab('questions')" id="admin-sub-nav-questions" class="admin-sub-btn active-admin-sub text-xs">
-                            <i class="fa-solid fa-book-open mr-1.5"></i>Reading & Listening
-                        </button>
-                        <button onclick="switchAdminSubTab('writing')" id="admin-sub-nav-writing" class="admin-sub-btn text-xs">
-                            <i class="fa-solid fa-file-signature mr-1.5"></i>Writing & Speaking Tasks
-                        </button>
-                        <button onclick="switchAdminSubTab('mocks')" id="admin-sub-nav-mocks" class="admin-sub-btn text-xs">
-                            <i class="fa-solid fa-layer-group mr-1.5"></i>Mock Exams Builder
-                        </button>
-                    </div>
-
-                    <!-- 1. Reading / Listening Manager -->
-                    <div id="admin-sub-questions" class="admin-sub-content space-y-6">
-                        <!-- Add Form -->
-                        <div class="apple-card p-6 space-y-5">
-                            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>Yangi test qo'shish</h3>
-                            
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Bo'lim</label>
-                                    <select id="q-section" onchange="toggleQuestionFields()" class="apple-input text-xs w-full">
-                                        <option value="reading">Reading</option>
-                                        <option value="listening">Listening</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Part (1-5)</label>
-                                    <input type="number" id="q-part" min="1" max="5" value="1" class="apple-input text-xs w-full">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Mavzu nomi</label>
-                                    <input type="text" id="q-title" placeholder="Masalan: History of Uzbekistan" class="apple-input text-xs w-full">
-                                </div>
+                <!-- 1. Reading / Listening Manager -->
+                <div id="admin-sub-questions" class="admin-sub-content space-y-6">
+                    <!-- Add Form -->
+                    <div class="apple-card p-6 space-y-5">
+                        <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>Yangi test qo'shish</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Bo'lim</label>
+                                <select id="q-section" onchange="toggleQuestionFields()" class="apple-input text-xs w-full">
+                                    <option value="reading">Reading</option>
+                                    <option value="listening">Listening</option>
+                                </select>
                             </div>
-
-                            <div id="reading-text-wrapper" class="space-y-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reading Matni</label>
-                                <textarea id="q-text" rows="5" placeholder="Reading test matnini bu yerga joylang..." class="apple-input text-xs w-full"></textarea>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Part (1-5)</label>
+                                <input type="number" id="q-part" min="1" max="5" value="1" class="apple-input text-xs w-full">
                             </div>
-
-                            <div id="listening-audio-wrapper" class="hidden space-y-3">
-                                 <div class="flex gap-2">
-                                     <button type="button" onclick="toggleAudioInputType('url')" id="btn-audio-type-url" class="apple-btn-secondary py-1 px-3 text-xs bg-slate-100 font-semibold">URL Manzil</button>
-                                     <button type="button" onclick="toggleAudioInputType('file')" id="btn-audio-type-file" class="apple-btn-secondary py-1 px-3 text-xs">Fayl yuklash</button>
-                                 </div>
-                                 <div id="audio-input-url-container" class="space-y-1">
-                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio link manzili (URL)</label>
-                                     <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="apple-input text-xs w-full">
-                                 </div>
-                                 <div id="audio-input-file-container" class="hidden space-y-2">
-                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio faylni tanlang</label>
-                                     <input type="file" id="q-audio-file" accept="audio/*,video/*" class="apple-input text-xs w-full">
-                                     <button type="button" onclick="uploadAudioFile()" class="apple-btn-secondary text-[11px] py-1 px-3">Faylni Serverga yuklash</button>
-                                     <div id="audio-upload-status" class="text-[10px] text-slate-500"></div>
-                                 </div>
-                            </div>
-
-                            <!-- Dynamic Questions Builder -->
-                            <div class="space-y-4 border-t border-slate-200 pt-5">
-                                <div class="flex items-center justify-between">
-                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Savollar ro'yxati</h4>
-                                    <button onclick="addQuestionRow()" class="apple-btn-secondary py-1.5 px-3 text-xs flex items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i>Savol qo'shish</button>
-                                </div>
-                                <div id="questions-builder-container" class="space-y-4">
-                                </div>
-                            </div>
-                            
-                            <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
-                                <button onclick="saveQuestion()" class="apple-btn-primary py-2.5 px-6 text-xs">Testni Saqlash</button>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Mavzu nomi</label>
+                                <input type="text" id="q-title" placeholder="Masalan: History of Uzbekistan" class="apple-input text-xs w-full">
                             </div>
                         </div>
 
-                        <!-- Current Questions List -->
-                        <div class="apple-card p-6">
-                            <h3 class="text-md font-bold mb-4 tracking-tight text-slate-800">Tizimdagi Mavjud Testlar</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm text-left">
-                                    <thead>
-                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">ID</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Bo'lim</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Part</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Sarlavha</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider text-center">Savollar</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">O'chirish</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="admin-questions-tbody" class="divide-y divide-slate-100">
-                                    </tbody>
-                                </table>
+                        <div id="reading-text-wrapper" class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Reading Matni</label>
+                            <textarea id="q-text" rows="5" placeholder="Reading test matnini bu yerga joylang..." class="apple-input text-xs w-full"></textarea>
+                        </div>
+
+                        <div id="listening-audio-wrapper" class="hidden space-y-3">
+                            <div class="flex gap-2">
+                                <button type="button" onclick="toggleAudioInputType('url')" id="btn-audio-type-url" class="apple-btn-secondary py-1 px-3 text-xs bg-slate-100 font-semibold">URL Manzil</button>
+                                <button type="button" onclick="toggleAudioInputType('file')" id="btn-audio-type-file" class="apple-btn-secondary py-1 px-3 text-xs">Fayl yuklash</button>
                             </div>
+                            <div id="audio-input-url-container" class="space-y-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio link manzili (URL)</label>
+                                <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="apple-input text-xs w-full">
+                            </div>
+                            <div id="audio-input-file-container" class="hidden space-y-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio faylni tanlang</label>
+                                <input type="file" id="q-audio-file" accept="audio/*,video/*" class="apple-input text-xs w-full">
+                                <button type="button" onclick="uploadAudioFile()" class="apple-btn-secondary text-[11px] py-1 px-3">Faylni Serverga yuklash</button>
+                                <div id="audio-upload-status" class="text-[10px] text-slate-500"></div>
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Questions Builder -->
+                        <div class="space-y-4 border-t border-slate-200 pt-5">
+                            <div class="flex items-center justify-between">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Savollar ro'yxati</h4>
+                                <button onclick="addQuestionRow()" class="apple-btn-secondary py-1.5 px-3 text-xs flex items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i>Savol qo'shish</button>
+                            </div>
+                            <div id="questions-builder-container" class="space-y-4">
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end gap-3 border-t border-slate-200 pt-4">
+                            <button onclick="saveQuestion()" class="apple-btn-primary py-2.5 px-6 text-xs">Testni Saqlash</button>
                         </div>
                     </div>
 
-                    <!-- 2. Writing / Speaking Task Manager -->
-                    <div id="admin-sub-writing" class="admin-sub-content hidden space-y-6">
-                        <!-- Add Form -->
-                        <div class="apple-card p-6 space-y-4">
-                            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>Yangi yozish / gapirish topshirig'i</h3>
-                            
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Turi</label>
-                                    <select id="task-type" onchange="toggleTaskFields()" class="apple-input text-xs w-full">
-                                        <option value="writing">Writing Task</option>
-                                        <option value="speaking">Speaking Task</option>
-                                    </select>
-                                </div>
-                                <div id="speaking-part-wrapper" class="hidden">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Part (1, 2, 3)</label>
-                                    <input type="number" id="task-part" min="1" max="3" value="1" class="apple-input text-xs w-full">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">CEFR Daraja</label>
-                                    <select id="task-level" class="apple-input text-xs w-full">
-                                        <option value="B1">B1</option>
-                                        <option value="B2">B2</option>
-                                        <option value="C1">C1</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Mavzu sarlavhasi</label>
-                                    <input type="text" id="task-title" placeholder="Mavzu nomini yozing..." class="apple-input text-xs w-full">
-                                </div>
+                    <!-- Current Questions List -->
+                    <div class="apple-card p-6">
+                        <h3 class="text-md font-bold mb-4 tracking-tight text-slate-800">Tizimdagi Mavjud Testlar</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">ID</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">Bo'lim</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">Part</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">Sarlavha</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-center">Savollar</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">O'chirish</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-questions-tbody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Writing / Speaking Task Manager -->
+                <div id="admin-sub-writing" class="admin-sub-content hidden space-y-6">
+                    <!-- Add Form -->
+                    <div class="apple-card p-6 space-y-4">
+                        <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>Yangi yozish / gapirish topshirig'i</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Turi</label>
+                                <select id="task-type" onchange="toggleTaskFields()" class="apple-input text-xs w-full">
+                                    <option value="writing">Writing Task</option>
+                                    <option value="speaking">Speaking Task</option>
+                                </select>
                             </div>
-                            
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Topshiriq tavsifi (Prompt)</label>
-                                <textarea id="task-prompt" rows="4" placeholder="Topshiriq matnini batafsil yozing..." class="apple-input text-xs w-full"></textarea>
+                            <div id="speaking-part-wrapper" class="hidden">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Part (1, 2, 3)</label>
+                                <input type="number" id="task-part" min="1" max="3" value="1" class="apple-input text-xs w-full">
                             </div>
-                            
-                            <div class="flex justify-end border-t border-slate-200 pt-4">
-                                <button onclick="saveTask()" class="apple-btn-primary py-2.5 px-6 text-xs">Topshiriqni Saqlash</button>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">CEFR Daraja</label>
+                                <select id="task-level" class="apple-input text-xs w-full">
+                                    <option value="B1">B1</option>
+                                    <option value="B2">B2</option>
+                                    <option value="C1">C1</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Mavzu sarlavhasi</label>
+                                <input type="text" id="task-title" placeholder="Mavzu nomini yozing..." class="apple-input text-xs w-full">
                             </div>
                         </div>
-
-                        <!-- Tasks List -->
-                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                            <div class="apple-card p-6 space-y-3">
-                                <h3 class="text-md font-bold tracking-tight text-slate-800">Writing Topshiriqlari</h3>
-                                <div class="overflow-y-auto max-h-96 pr-1">
-                                    <ul id="admin-writings-ul" class="space-y-2"></ul>
-                                </div>
-                            </div>
-                            <div class="apple-card p-6 space-y-3">
-                                <h3 class="text-md font-bold tracking-tight text-slate-800">Speaking Topshiriqlari</h3>
-                                <div class="overflow-y-auto max-h-96 pr-1">
-                                    <ul id="admin-speakings-ul" class="space-y-2"></ul>
-                                </div>
-                            </div>
+                        
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Topshiriq tavsifi (Prompt)</label>
+                            <textarea id="task-prompt" rows="4" placeholder="Topshiriq matnini batafsil yozing..." class="apple-input text-xs w-full"></textarea>
+                        </div>
+                        
+                        <div class="flex justify-end border-t border-slate-200 pt-4">
+                            <button onclick="saveTask()" class="apple-btn-primary py-2.5 px-6 text-xs">Topshiriqni Saqlash</button>
                         </div>
                     </div>
 
-                    <!-- 3. Mock Exam Manager -->
-                    <div id="admin-sub-mocks" class="admin-sub-content hidden space-y-6">
-                        <!-- Add Form -->
-                        <div class="apple-card p-6 space-y-5">
-                            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-cubes text-blue-500 mr-2"></i>Yangi Mock Imtihoni Yaratish</h3>
-                            
-                            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imtihon nomi</label>
-                                    <input type="text" id="mock-title" placeholder="Masalan: CEFR Mock Exam #2" class="apple-input text-xs w-full">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Narxi (UZS)</label>
-                                    <input type="number" id="mock-price" value="30000" class="apple-input text-xs w-full">
-                                </div>
+                    <!-- Tasks List -->
+                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div class="apple-card p-6 space-y-3">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800">Writing Topshiriqlari</h3>
+                            <div class="overflow-y-auto max-h-96 pr-1">
+                                <ul id="admin-writings-ul" class="space-y-2"></ul>
                             </div>
-
-                            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                <div class="space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">1. Reading & Listening testlar</label>
-                                    <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-questions-picker">
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">2. Writing topshiriq</label>
-                                    <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-writings-picker">
-                                    </div>
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">3. Speaking topshiriq</label>
-                                    <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-speakings-picker">
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="apple-card p-6 space-y-3">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800">Speaking Topshiriqlari</h3>
+                            <div class="overflow-y-auto max-h-96 pr-1">
+                                <ul id="admin-speakings-ul" class="space-y-2"></ul>
                             </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="flex justify-end border-t border-slate-200 pt-4">
-                                <button onclick="saveMockExam()" class="apple-btn-primary py-2.5 px-6 text-xs">Mock Examni Yaratish</button>
+                <!-- 3. Mock Exam Manager -->
+                <div id="admin-sub-mocks" class="admin-sub-content hidden space-y-6">
+                    <!-- Add Form -->
+                    <div class="apple-card p-6 space-y-5">
+                        <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-cubes text-blue-500 mr-2"></i>Yangi Mock Imtihoni Yaratish</h3>
+                        
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imtihon nomi</label>
+                                <input type="text" id="mock-title" placeholder="Masalan: CEFR Mock Exam #2" class="apple-input text-xs w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Narxi (UZS)</label>
+                                <input type="number" id="mock-price" value="30000" class="apple-input text-xs w-full">
                             </div>
                         </div>
 
-                        <!-- Current Mock Exams -->
-                        <div class="apple-card p-6">
-                            <h3 class="text-md font-bold mb-4 tracking-tight text-slate-800">Mavjud Mock Examlar</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-sm text-left">
-                                    <thead>
-                                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">ID</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Sarlavha</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">Narxi</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">R/L testlar</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">W topshiriq</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider">S topshiriq</th>
-                                            <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">O'chirish</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="admin-mocks-tbody" class="divide-y divide-slate-100">
-                                    </tbody>
-                                </table>
+                        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">1. Reading & Listening testlar</label>
+                                <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-questions-picker">
+                                </div>
                             </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">2. Writing topshiriq</label>
+                                <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-writings-picker">
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">3. Speaking topshiriq</label>
+                                <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-speakings-picker">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end border-t border-slate-200 pt-4">
+                            <button onclick="saveMockExam()" class="apple-btn-primary py-2.5 px-6 text-xs">Mock Examni Yaratish</button>
+                        </div>
+                    </div>
+
+                    <!-- Current Mock Exams -->
+                    <div class="apple-card p-6">
+                        <h3 class="text-md font-bold mb-4 tracking-tight text-slate-800">Mavjud Mock Examlar</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-600">
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">ID</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">Sarlavha</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">Narxi</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">R/L testlar</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">W topshiriq</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider">S topshiriq</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">O'chirish</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-mocks-tbody" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -603,7 +419,7 @@
         
         <!-- Footer -->
         <footer class="border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-400">
-            <p>© 2026 CEFR Prep Hub. iOS minimalist dizayn tizimi.</p>
+            <p>© 2026 CEFR Prep Hub Admin. iOS minimalist dizayn tizimi.</p>
         </footer>
     </div>
 
@@ -629,7 +445,6 @@
     <script>
         let API_URL = localStorage.getItem('api_url') || window.location.origin;
         let adminToken = localStorage.getItem('admin_token') || '';
-        let chartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Telegram?.WebApp) {
@@ -637,7 +452,6 @@
                 window.Telegram.WebApp.expand();
             }
             
-            // Parse api_url from URL query params automatically
             const urlParams = new URLSearchParams(window.location.search);
             const apiUrlParam = urlParams.get('api_url');
             if (apiUrlParam) {
@@ -657,8 +471,6 @@
                 window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
             }
 
-            const hash = window.location.hash || '#dashboard';
-            switchTab(hash.replace('#', ''));
             checkAdminStatus();
             addQuestionRow();
         });
@@ -683,217 +495,15 @@
             API_URL = url;
             closeSettings();
             showAlert("Sozlamalar saqlandi. API URL: " + API_URL);
-            const activeTab = document.querySelector('.segmented-btn.active').id.replace('nav-', '');
-            switchTab(activeTab);
+            checkAdminStatus();
         }
 
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        function switchTab(tabName) {
-            window.location.hash = tabName;
-
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            const activeTabEl = document.getElementById(`tab-${tabName}`);
-            if (activeTabEl) activeTabEl.classList.remove('hidden');
+        function switchAdminSubTab(subName) {
+            document.querySelectorAll('.admin-sub-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`admin-sub-${subName}`).classList.remove('hidden');
 
             document.querySelectorAll('.segmented-btn').forEach(el => el.classList.remove('active'));
-            const activeBtn = document.getElementById(`nav-${tabName}`);
-            if (activeBtn) activeBtn.classList.add('active');
-
-            if (tabName === 'dashboard') {
-                let tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-                let defaultId = tgUser && tgUser.id ? tgUser.id : (localStorage.getItem('last_searched_tg_id') || 123456789);
-                document.getElementById('stats-tg-id').value = defaultId;
-                loadDashboard(defaultId);
-            } else if (tabName === 'leaderboard') {
-                loadLeaderboard();
-            } else if (tabName === 'mock') {
-                loadMockExams();
-            } else if (tabName === 'admin') {
-                checkAdminStatus();
-            }
-        }
-
-        async function loadStatsByInput() {
-            const tgId = document.getElementById('stats-tg-id').value.trim();
-            if (!tgId) {
-                showAlert("Iltimos, Telegram ID kiriting.");
-                return;
-            }
-            localStorage.setItem('last_searched_tg_id', tgId);
-            loadDashboard(tgId);
-        }
-
-        async function loadDashboard(tgId) {
-            try {
-                const response = await fetch(`${API_URL}/api/stats/${tgId}`);
-                if (!response.ok) throw new Error("Foydalanuvchi topilmadi");
-                
-                const data = await response.json();
-                
-                document.getElementById('user-avatar').innerText = data.user.first_name ? data.user.first_name[0].toUpperCase() : 'U';
-                document.getElementById('user-name').innerText = data.user.first_name || 'Talaba';
-                document.getElementById('user-streak-badge').innerText = `${data.user.streak || 0} kun streak`;
-                document.getElementById('user-xp-badge').innerText = `${data.user.xp || 0} XP`;
-                
-                document.getElementById('stat-tests').innerText = `${data.stats.tests_completed} ta`;
-                document.getElementById('stat-avg-test').innerText = `${data.stats.average_test_score.toFixed(1)}%`;
-                
-                document.getElementById('stat-writings').innerText = `${data.stats.writings_completed} ta`;
-                document.getElementById('stat-avg-writing').innerText = `O'rtacha: ${data.stats.average_writing_score.toFixed(1)}/100`;
-                
-                document.getElementById('stat-speakings').innerText = `${data.stats.speakings_completed} ta`;
-                document.getElementById('stat-avg-speaking').innerText = `O'rtacha: ${data.stats.average_speaking_score.toFixed(1)}/100`;
-
-                renderChart(data.stats);
-                loadAchievements(data.achievements);
-
-            } catch (err) {
-                console.error(err);
-                showAlert(`Kiritilgan Telegram ID (${tgId}) bo'yicha profil topilmadi. Botni ishga tushirib /start bosing.`);
-            }
-        }
-
-        function renderChart(stats) {
-            const ctx = document.getElementById('progressChart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
-
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: ['Reading & Listening (%)', 'Writing Score (100)', 'Speaking Score (100)'],
-                    datasets: [{
-                        label: 'Natija',
-                        data: [stats.average_test_score, stats.average_writing_score, stats.average_speaking_score],
-                        backgroundColor: ['rgba(0, 113, 227, 0.75)', 'rgba(99, 102, 241, 0.75)', 'rgba(244, 63, 94, 0.75)'],
-                        borderColor: ['#0071e3', '#6366f1', '#f43f5e'],
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        barThickness: 36
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                            ticks: { color: '#86868b', font: { family: 'Inter', size: 10 } }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#86868b', font: { family: 'Inter', size: 10 } }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-        }
-
-        function loadAchievements(unlockedAchievements) {
-            const list = document.getElementById('achievements-list');
-            list.innerHTML = '';
-
-            const allAchievements = [
-                { id: "first_test", name: "Birinchi Qadam", description: "Birinchi topshirilgan test", iconClass: "fa-solid fa-flag text-blue-500", bgClass: "bg-blue-50" },
-                { id: "streak_3", name: "Faol O'quvchi", description: "3 kunlik kirish (Streak)", iconClass: "fa-solid fa-fire text-orange-500", bgClass: "bg-orange-50" },
-                { id: "streak_7", name: "Chempion", description: "7 kunlik kirish (Streak)", iconClass: "fa-solid fa-crown text-amber-500", bgClass: "bg-amber-50" },
-                { id: "perfect_score", name: "A'lochi", description: "Testdan 100% natija", iconClass: "fa-solid fa-star text-yellow-500", bgClass: "bg-yellow-50" },
-                { id: "mock_master", name: "Mock Master", description: "Mock imtihon topshirildi", iconClass: "fa-solid fa-graduation-cap text-indigo-500", bgClass: "bg-indigo-50" },
-                { id: "writing_pro", name: "Ijodkor", description: "Yozma topshiriq yakunlandi", iconClass: "fa-solid fa-pen-nib text-purple-500", bgClass: "bg-purple-50" },
-                { id: "speaking_pro", name: "Notiq", description: "Speaking topshiriq yakunlandi", iconClass: "fa-solid fa-microphone text-rose-505", bgClass: "bg-rose-50" }
-            ];
-
-            allAchievements.forEach(ach => {
-                const isUnlocked = unlockedAchievements.some(ua => ua.id === ach.id);
-                const cardClass = isUnlocked ? 'unlocked' : 'locked';
-                list.innerHTML += `
-                    <div class="flex items-center gap-3.5 p-3 rounded-2xl border badge-card ${cardClass} transition duration-300">
-                        <div class="w-10 h-10 rounded-xl ${isUnlocked ? ach.bgClass : 'bg-slate-100'} flex items-center justify-center border border-black/5">
-                            <i class="${ach.iconClass} text-md ${isUnlocked ? '' : 'text-slate-400'}"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-xs font-bold text-slate-800">${ach.name}</h4>
-                            <p class="text-[10px] text-slate-500">${ach.description}</p>
-                        </div>
-                    </div>
-                `;
-            });
-        }
-
-        async function loadLeaderboard() {
-            try {
-                const response = await fetch(`${API_URL}/api/leaderboard`);
-                const data = await response.json();
-                const tbody = document.getElementById('leaderboard-body');
-                tbody.innerHTML = '';
-
-                if (data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400 italic text-xs">Peshqadamlar ro'yxati bo'sh.</td></tr>`;
-                    return;
-                }
-
-                const medal_icons = {
-                    1: '<div class="w-7 h-7 rounded-full bg-yellow-50 border border-yellow-250 flex items-center justify-center"><i class="fa-solid fa-trophy text-yellow-600 text-xs"></i></div>',
-                    2: '<div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center"><i class="fa-solid fa-trophy text-slate-500 text-xs"></i></div>',
-                    3: '<div class="w-7 h-7 rounded-full bg-amber-50 border border-amber-250 flex items-center justify-center"><i class="fa-solid fa-trophy text-amber-700 text-xs"></i></div>'
-                };
-
-                data.forEach((user, idx) => {
-                    const rank_display = medal_icons[idx + 1] || `<span class="text-xs font-bold text-slate-400 pl-2.5">${idx + 1}</span>`;
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50/50 transition">
-                            <td class="p-4">${rank_display}</td>
-                            <td class="p-4 font-semibold text-slate-800">${user.first_name || 'Foydalanuvchi'}</td>
-                            <td class="p-4 text-center text-orange-500 font-semibold">${user.streak || 0} <i class="fa-solid fa-fire text-orange-500 ml-1"></i></td>
-                            <td class="p-4 text-right font-bold text-blue-600">${user.xp} XP</td>
-                        </tr>
-                    `;
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        async function loadMockExams() {
-            try {
-                const response = await fetch(`${API_URL}/api/mock-exams`);
-                const data = await response.json();
-                const grid = document.getElementById('mock-list-grid');
-                grid.innerHTML = '';
-
-                if (data.length === 0) {
-                    grid.innerHTML = `<div class="col-span-full text-center text-slate-400 italic py-8 text-xs">Hozircha sotuvda Mock Imtihonlar yo'q.</div>`;
-                    return;
-                }
-
-                data.forEach(mock => {
-                    grid.innerHTML += `
-                        <div class="apple-card p-6 flex flex-col justify-between h-64 bg-white">
-                            <div>
-                                <div class="flex items-center justify-between">
-                                    <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-blue-100 uppercase tracking-wider">CEFR Mock</span>
-                                    <span class="text-slate-900 font-extrabold text-sm">${mock.price.toLocaleString()} UZS</span>
-                                </div>
-                                <h3 class="text-md font-bold mt-4 tracking-tight text-slate-800">${mock.title}</h3>
-                                <ul class="mt-3 space-y-1.5 text-xs text-slate-550">
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i><span>Reading/Listening: ${mock.questions_count} ta savol</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-indigo-500 text-[10px]"></i><span>Writing: ${mock.writing_count} ta insho</span></li>
-                                    <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-rose-500 text-[10px]"></i><span>Speaking: ${mock.speaking_count} ta savol</span></li>
-                                </ul>
-                            </div>
-                            <button onclick="showAlert('Imtihonni topshirish uchun Telegram botimizga kiring!')" class="w-full apple-btn-primary py-2 text-xs font-semibold mt-4">Botda topshirish</button>
-                        </div>
-                    `;
-                });
-            } catch (err) {
-                console.error(err);
-            }
+            document.getElementById(`admin-sub-nav-${subName}`).classList.add('active');
         }
 
         function checkAdminStatus() {
@@ -929,14 +539,6 @@
             localStorage.removeItem('admin_token');
             adminToken = '';
             checkAdminStatus();
-        }
-
-        function switchAdminSubTab(subName) {
-            document.querySelectorAll('.admin-sub-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`admin-sub-${subName}`).classList.remove('hidden');
-
-            document.querySelectorAll('.admin-sub-btn').forEach(el => el.classList.remove('active-admin-sub'));
-            document.getElementById(`admin-sub-nav-${subName}`).classList.add('active-admin-sub');
         }
 
         function loadAdminData() {
@@ -992,74 +594,6 @@
             }
         }
 
-        let uploadedAudioUrl = "";
-
-        function toggleAudioInputType(type) {
-            const urlContainer = document.getElementById('audio-input-url-container');
-            const fileContainer = document.getElementById('audio-input-file-container');
-            const btnUrl = document.getElementById('btn-audio-type-url');
-            const btnFile = document.getElementById('btn-audio-type-file');
-            
-            if (type === 'url') {
-                urlContainer.classList.remove('hidden');
-                fileContainer.classList.add('hidden');
-                btnUrl.classList.add('bg-slate-100', 'font-semibold');
-                btnUrl.classList.remove('border-slate-200');
-                btnFile.classList.remove('bg-slate-100', 'font-semibold');
-                btnFile.classList.add('border-slate-200');
-                uploadedAudioUrl = "";
-            } else {
-                urlContainer.classList.add('hidden');
-                fileContainer.classList.remove('hidden');
-                btnUrl.classList.remove('bg-slate-100', 'font-semibold');
-                btnUrl.classList.add('border-slate-200');
-                btnFile.classList.add('bg-slate-100', 'font-semibold');
-                btnFile.classList.remove('border-slate-200');
-            }
-        }
-
-        async function uploadAudioFile() {
-            const fileInput = document.getElementById('q-audio-file');
-            const statusDiv = document.getElementById('audio-upload-status');
-            
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showAlert("Iltimos fayl tanlang.");
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            statusDiv.innerText = "Yuklanmoqda... <i class="fa-solid fa-spinner fa-spin text-blue-500 ml-1"></i>";
-            statusDiv.className = "text-[10px] text-blue-500 mt-1";
-            
-            try {
-                const response = await fetch(`${API_URL}/api/admin/upload-audio`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${adminToken}`
-                    },
-                    body: formData
-                });
-                
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.detail || "Fayl yuklashda xatolik.");
-                }
-                
-                const data = await response.json();
-                uploadedAudioUrl = data.url;
-                statusDiv.innerText = "Fayl muvaffaqiyatli yuklandi! <i class="fa-solid fa-circle-check text-emerald-500 ml-1"></i>";
-                statusDiv.className = "text-[10px] text-emerald-600 mt-1";
-            } catch (err) {
-                console.error(err);
-                statusDiv.innerText = "Xatolik: " + err.message;
-                statusDiv.className = "text-[10px] text-red-500 mt-1";
-                uploadedAudioUrl = "";
-            }
-        }
-
         function toggleQuestionFields() {
             const sec = document.getElementById('q-section').value;
             const readingText = document.getElementById('reading-text-wrapper');
@@ -1106,9 +640,79 @@
             container.appendChild(row);
         }
 
+        let uploadedAudioUrl = "";
+
+        function toggleAudioInputType(type) {
+            const urlContainer = document.getElementById('audio-input-url-container');
+            const fileContainer = document.getElementById('audio-input-file-container');
+            const btnUrl = document.getElementById('btn-audio-type-url');
+            const btnFile = document.getElementById('btn-audio-type-file');
+            
+            if (type === 'url') {
+                urlContainer.classList.remove('hidden');
+                fileContainer.classList.add('hidden');
+                btnUrl.classList.add('bg-slate-100', 'font-semibold');
+                btnUrl.classList.remove('border-slate-200');
+                btnFile.classList.remove('bg-slate-100', 'font-semibold');
+                btnFile.classList.add('border-slate-200');
+                uploadedAudioUrl = "";
+            } else {
+                urlContainer.classList.add('hidden');
+                fileContainer.classList.remove('hidden');
+                btnUrl.classList.remove('bg-slate-100', 'font-semibold');
+                btnUrl.classList.add('border-slate-200');
+                btnFile.classList.add('bg-slate-100', 'font-semibold');
+                btnFile.classList.remove('border-slate-200');
+            }
+        }
+
+        async function uploadAudioFile() {
+            const fileInput = document.getElementById('q-audio-file');
+            const statusDiv = document.getElementById('audio-upload-status');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showAlert("Iltimos fayl tanlang.");
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            statusDiv.innerText = "Yuklanmoqda... ";
+            statusDiv.innerHTML = 'Yuklanmoqda... <i class="fa-solid fa-spinner fa-spin text-blue-500 ml-1"></i>';
+            statusDiv.className = "text-[10px] text-blue-500 mt-1";
+            
+            try {
+                const response = await fetch(`${API_URL}/api/admin/upload-audio`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${adminToken}`
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.detail || "Fayl yuklashda xatolik.");
+                }
+                
+                const data = await response.json();
+                uploadedAudioUrl = data.url;
+                statusDiv.innerHTML = 'Fayl muvaffaqiyatli yuklandi! <i class="fa-solid fa-circle-check text-emerald-500 ml-1"></i>';
+                statusDiv.className = "text-[10px] text-emerald-600 mt-1";
+            } catch (err) {
+                console.error(err);
+                statusDiv.innerText = "Xatolik: " + err.message;
+                statusDiv.className = "text-[10px] text-red-500 mt-1";
+                uploadedAudioUrl = "";
+            }
+        }
+
         async function saveQuestion() {
             const section = document.getElementById('q-section').value;
             const part = parseInt(document.getElementById('q-part').value);
+            const title = document.getElementById('q-title').value.trim();
             const text = document.getElementById('q-text').value.trim();
             const audioUrlInput = document.getElementById('q-audio-url').value.trim();
             const audioUrl = uploadedAudioUrl ? uploadedAudioUrl : audioUrlInput;
@@ -1174,7 +778,7 @@
                     const fileInput = document.getElementById('q-audio-file');
                     if (fileInput) fileInput.value = "";
                     const statusDiv = document.getElementById('audio-upload-status');
-                    if (statusDiv) statusDiv.innerText = "";
+                    if (statusDiv) statusDiv.innerHTML = "";
                     toggleAudioInputType('url');
                     document.getElementById('questions-builder-container').innerHTML = '';
                     addQuestionRow();
@@ -1209,7 +813,7 @@
                                 <h4 class="font-bold text-xs text-slate-800">${w.title} (${w.level})</h4>
                                 <p class="text-[10px] text-slate-500 truncate max-w-xs">${w.prompt}</p>
                             </div>
-                            <button onclick="deleteTask('writing', ${w.id})" class="text-red-505 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteTask('writing', ${w.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
                         </li>
                     `;
                 });
@@ -1223,7 +827,7 @@
                                 <h4 class="font-bold text-xs text-slate-800">${s.title} (Part ${s.part} — ${s.level})</h4>
                                 <p class="text-[10px] text-slate-500 truncate max-w-xs">${s.prompt}</p>
                             </div>
-                            <button onclick="deleteTask('speaking', ${s.id})" class="text-red-505 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteTask('speaking', ${s.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
                         </li>
                     `;
                 });
