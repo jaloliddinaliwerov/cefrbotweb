@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CEFR Test</title>
+    <!-- Tailwind CSS ulash -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Telegram WebApp API ulash -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Telegram mavzusiga moslashish (Qora/Oq rejim) */
+        body {
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            font-family: 'Inter', sans-serif;
+        }
+        .tg-button {
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
+    </style>
+</head>
+<body class="p-4 flex flex-col h-screen">
+
+    <div class="text-xl font-bold mb-4 border-b pb-2">
+        📖 {{ section | capitalize }} - Part {{ part }}
+    </div>
+
+    <!-- Matn qismi (Scroll bo'ladigan) -->
+    <div class="flex-1 overflow-y-auto mb-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow-inner text-sm leading-relaxed text-gray-800 dark:text-gray-200">
+        {{ data.text }}
+    </div>
+
+    <!-- Savollar qismi -->
+    <div class="flex-1 overflow-y-auto" id="questions-container">
+        {% for question in data.questions %}
+        <div class="mb-6">
+            <p class="font-semibold mb-2">{{ question.id }}. {{ question.q }}</p>
+            <div class="space-y-2">
+                {% for option in question.options %}
+                <label class="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                    <input type="radio" name="q_{{ question.id }}" value="{{ option }}" class="form-radio h-5 w-5 text-blue-600">
+                    <span>{{ option }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Telegram sozlamalarini ishga tushirish
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Oynani to'liq ekranga ochish
+        
+        // "Jo'natish" tugmasini Telegramni o'zining pastki tugmasi orqali ko'rsatamiz
+        tg.MainButton.text = "Javoblarni Yuborish";
+        tg.MainButton.show();
+
+        tg.MainButton.onClick(() => {
+            // Javoblarni yig'ish
+            let answers = {};
+            let allAnswered = true;
+
+            {% for question in data.questions %}
+                let selected_{{ question.id }} = document.querySelector('input[name="q_{{ question.id }}"]:checked');
+                if (selected_{{ question.id }}) {
+                    answers["{{ question.id }}"] = selected_{{ question.id }}.value;
+                } else {
+                    allAnswered = false;
+                }
+            {% endfor %}
+
+            if (!allAnswered) {
+                tg.showAlert("Iltimos, barcha savollarga javob bering!");
+                return;
+            }
+
+            // Javoblarni serverga (FastAPI) yuborish
+            fetch('/api/submit_test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: tg.initDataUnsafe.user.id,
+                    section: "{{ section }}",
+                    part: "{{ part }}",
+                    answers: answers
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Javob ketgach web oynani yopish
+                tg.close(); 
+            })
+            .catch((error) => {
+                tg.showAlert("Xatolik yuz berdi. Qaytadan urinib ko'ring.");
+            });
+        });
+    </script>
+</body>
+</html>
