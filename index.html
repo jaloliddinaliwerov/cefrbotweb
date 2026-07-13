@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz" class="h-full bg-[#f5f5f7] text-[#1d1d1f]">
+<html lang="uz" class="min-h-screen bg-[#f5f5f7] text-[#1d1d1f]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -156,7 +156,7 @@
         }
     </style>
 </head>
-<body class="h-full antialiased text-[#1d1d1f] flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900">
+<body class="min-h-screen antialiased text-[#1d1d1f] flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900">
 
     <div class="flex-1 flex flex-col">
         <!-- Navigation Header -->
@@ -636,12 +636,20 @@
                 window.Telegram.WebApp.ready();
                 window.Telegram.WebApp.expand();
             }
+            
+            // Parse api_url from URL query params automatically
+            const urlParams = new URLSearchParams(window.location.search);
+            const apiUrlParam = urlParams.get('api_url');
+            if (apiUrlParam) {
+                localStorage.setItem('api_url', apiUrlParam.trim().replace(/\/$/, ""));
+                API_URL = apiUrlParam.trim().replace(/\/$/, "");
+            }
+
             if (!localStorage.getItem('api_url') && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
                 API_URL = window.location.origin;
             }
             document.getElementById('api-url-input').value = API_URL;
 
-            const urlParams = new URLSearchParams(window.location.search);
             const tokenParam = urlParams.get('token');
             if (tokenParam) {
                 localStorage.setItem('admin_token', tokenParam);
@@ -655,6 +663,14 @@
             addQuestionRow();
         });
 
+        function showAlert(message) {
+            if (window.Telegram?.WebApp?.showAlert) {
+                window.Telegram.WebApp.showAlert(message);
+            } else {
+                alert(message);
+            }
+        }
+
         function openSettings() {
             document.getElementById('settings-modal').classList.remove('hidden');
         }
@@ -666,7 +682,7 @@
             localStorage.setItem('api_url', url);
             API_URL = url;
             closeSettings();
-            alert("Sozlamalar saqlandi. API URL: " + API_URL);
+            showAlert("Sozlamalar saqlandi. API URL: " + API_URL);
             const activeTab = document.querySelector('.segmented-btn.active').id.replace('nav-', '');
             switchTab(activeTab);
         }
@@ -704,7 +720,7 @@
         async function loadStatsByInput() {
             const tgId = document.getElementById('stats-tg-id').value.trim();
             if (!tgId) {
-                alert("Iltimos, Telegram ID kiriting.");
+                showAlert("Iltimos, Telegram ID kiriting.");
                 return;
             }
             localStorage.setItem('last_searched_tg_id', tgId);
@@ -737,7 +753,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert(`Kiritilgan Telegram ID (${tgId}) bo'yicha profil topilmadi. Botni ishga tushirib /start bosing.`);
+                showAlert(`Kiritilgan Telegram ID (${tgId}) bo'yicha profil topilmadi. Botni ishga tushirib /start bosing.`);
             }
         }
 
@@ -871,7 +887,7 @@
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-rose-500 text-[10px]"></i><span>Speaking: ${mock.speaking_count} ta savol</span></li>
                                 </ul>
                             </div>
-                            <button onclick="alert('Imtihonni topshirish uchun Telegram botimizga kiring!')" class="w-full apple-btn-primary py-2 text-xs font-semibold mt-4">Botda topshirish</button>
+                            <button onclick="showAlert('Imtihonni topshirish uchun Telegram botimizga kiring!')" class="w-full apple-btn-primary py-2 text-xs font-semibold mt-4">Botda topshirish</button>
                         </div>
                     `;
                 });
@@ -901,7 +917,7 @@
         function loginAdmin() {
             const token = document.getElementById('admin-token-input').value.trim();
             if (!token) {
-                alert("Iltimos token kiriting.");
+                showAlert("Iltimos token kiriting.");
                 return;
             }
             localStorage.setItem('admin_token', token);
@@ -968,11 +984,11 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    alert("O'chirildi!");
+                    showAlert("O'chirildi!");
                     loadAdminQuestions();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1007,7 +1023,7 @@
             const statusDiv = document.getElementById('audio-upload-status');
             
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Iltimos fayl tanlang.");
+                showAlert("Iltimos fayl tanlang.");
                 return;
             }
             
@@ -1098,7 +1114,7 @@
             const audioUrl = uploadedAudioUrl ? uploadedAudioUrl : audioUrlInput;
             
             if (!title) {
-                alert("Sarlavhani kiriting.");
+                showAlert("Sarlavhani kiriting.");
                 return;
             }
             
@@ -1114,7 +1130,7 @@
                 const answer = row.querySelector('select').value;
                 
                 if (!qText || !optA || !optB) {
-                    alert(`Savol #${i+1} ni to'liq to'ldiring.`);
+                    showAlert(`Savol #${i+1} ni to'liq to'ldiring.`);
                     return;
                 }
                 questionsList.push({
@@ -1126,7 +1142,7 @@
             }
 
             if (questionsList.length === 0) {
-                alert("Kamida bitta savol qo'shing.");
+                showAlert("Kamida bitta savol qo'shing.");
                 return;
             }
 
@@ -1150,7 +1166,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    alert("Test saqlandi!");
+                    showAlert("Test saqlandi!");
                     document.getElementById('q-title').value = '';
                     document.getElementById('q-text').value = '';
                     document.getElementById('q-audio-url').value = '';
@@ -1165,10 +1181,10 @@
                     loadAdminQuestions();
                 } else {
                     const data = await response.json();
-                    alert("Xatolik: " + data.detail);
+                    showAlert("Xatolik: " + data.detail);
                 }
             } catch (err) {
-                alert("API ulanish xatosi.");
+                showAlert("API ulanish xatosi.");
             }
         }
 
@@ -1225,11 +1241,11 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    alert("O'chirildi!");
+                    showAlert("O'chirildi!");
                     loadAdminTasks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1251,7 +1267,7 @@
             const prompt = document.getElementById('task-prompt').value.trim();
             
             if (!title || !prompt) {
-                alert("Sarlavha va promptni to'ldiring.");
+                showAlert("Sarlavha va promptni to'ldiring.");
                 return;
             }
 
@@ -1269,13 +1285,13 @@
                     body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    alert("Topshiriq saqlandi!");
+                    showAlert("Topshiriq saqlandi!");
                     document.getElementById('task-title').value = '';
                     document.getElementById('task-prompt').value = '';
                     loadAdminTasks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1316,11 +1332,11 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    alert("O'chirildi!");
+                    showAlert("O'chirildi!");
                     loadAdminMocks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1366,7 +1382,7 @@
             const price = parseInt(document.getElementById('mock-price').value) || 0;
             
             if (!title) {
-                alert("Sarlavha yozing.");
+                showAlert("Sarlavha yozing.");
                 return;
             }
 
@@ -1375,7 +1391,7 @@
             const speaking_ids = Array.from(document.querySelectorAll('.mock-s-checkbox:checked')).map(el => parseInt(el.value));
 
             if (questions_ids.length === 0 && writing_ids.length === 0 && speaking_ids.length === 0) {
-                alert("Kamida bitta topshiriq tanlang.");
+                showAlert("Kamida bitta topshiriq tanlang.");
                 return;
             }
 
@@ -1391,14 +1407,14 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    alert("Mock Imtihoni yaratildi!");
+                    showAlert("Mock Imtihoni yaratildi!");
                     document.getElementById('mock-title').value = '';
                     document.getElementById('mock-price').value = '30000';
                     document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => el.checked = false);
                     loadAdminMocks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
     </script>

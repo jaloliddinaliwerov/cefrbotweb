@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz" class="h-full bg-[#f5f5f7] text-[#1d1d1f]">
+<html lang="uz" class="min-h-screen bg-[#f5f5f7] text-[#1d1d1f]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -156,7 +156,7 @@
         }
     </style>
 </head>
-<body class="h-full antialiased text-[#1d1d1f] flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900">
+<body class="min-h-screen antialiased text-[#1d1d1f] flex flex-col justify-between selection:bg-blue-100 selection:text-blue-900">
 
     <div class="flex-1 flex flex-col">
         <!-- Navigation Header -->
@@ -203,10 +203,10 @@
             
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden border-t border-black/5 bg-white px-4 py-4 flex flex-col gap-2">
-                <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-550 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-chart-line mr-3 text-blue-500"></i>Dashboard</button>
-                <button onclick="switchTab('leaderboard'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-550 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-trophy mr-3 text-amber-500"></i>Leaderboard</button>
-                <button onclick="switchTab('mock'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-550 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-file-invoice mr-3 text-indigo-500"></i>Mock Exams</button>
-                <button onclick="switchTab('admin'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-550 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-lock mr-3 text-red-500"></i>Admin Panel</button>
+                <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-chart-line mr-3 text-blue-500"></i>Dashboard</button>
+                <button onclick="switchTab('leaderboard'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-trophy mr-3 text-amber-500"></i>Leaderboard</button>
+                <button onclick="switchTab('mock'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-file-invoice mr-3 text-indigo-500"></i>Mock Exams</button>
+                <button onclick="switchTab('admin'); toggleMobileMenu()" class="w-full py-2.5 px-3 hover:bg-slate-50 rounded-lg text-sm text-slate-800 font-semibold text-left"><i class="fa-solid fa-lock mr-3 text-red-500"></i>Admin Panel</button>
             </div>
         </header>
 
@@ -223,7 +223,7 @@
                         </div>
                         <div class="space-y-1">
                             <h2 class="text-2xl font-bold tracking-tight text-slate-900" id="user-name">Salom, Talaba!</h2>
-                            <p class="text-slate-555 text-xs font-normal">Tizim orqali o'quv ko'rsatkichlaringizni kuzatib boring.</p>
+                            <p class="text-slate-500 text-xs font-normal">Tizim orqali o'quv ko'rsatkichlaringizni kuzatib boring.</p>
                             <div class="pt-1 flex gap-2 justify-center lg:justify-start">
                                 <span class="bg-orange-50 text-orange-600 text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full border border-orange-200 flex items-center gap-1.5">
                                     <i class="fa-solid fa-fire"></i> <span id="user-streak-badge">0 Kun streak</span>
@@ -252,7 +252,7 @@
                             </div>
                         </div>
                         <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-tests">0 ta</div>
-                        <div class="text-slate-555 text-[10px] mt-1">Reading & Listening</div>
+                        <div class="text-slate-500 text-[10px] mt-1">Reading & Listening</div>
                     </div>
                     <div class="apple-card p-5 relative overflow-hidden group">
                         <div class="flex items-center justify-between">
@@ -262,7 +262,7 @@
                             </div>
                         </div>
                         <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-avg-test">0%</div>
-                        <div class="text-slate-555 text-[10px] mt-1">To'g'ri javoblar ko'rsatkichi</div>
+                        <div class="text-slate-500 text-[10px] mt-1">To'g'ri javoblar ko'rsatkichi</div>
                     </div>
                     <div class="apple-card p-5 relative overflow-hidden group">
                         <div class="flex items-center justify-between">
@@ -272,7 +272,7 @@
                             </div>
                         </div>
                         <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-writings">0 ta</div>
-                        <div class="text-slate-555 text-[10px] mt-1 text-slate-400" id="stat-avg-writing">O'rtacha: 0/100 ball</div>
+                        <div class="text-slate-500 text-[10px] mt-1 text-slate-400" id="stat-avg-writing">O'rtacha: 0/100 ball</div>
                     </div>
                     <div class="apple-card p-5 relative overflow-hidden group">
                         <div class="flex items-center justify-between">
@@ -282,7 +282,7 @@
                             </div>
                         </div>
                         <div class="text-3xl font-extrabold mt-4 text-slate-900" id="stat-speakings">0 ta</div>
-                        <div class="text-slate-555 text-[10px] mt-1 text-slate-400" id="stat-avg-speaking">O'rtacha: 0/100 ball</div>
+                        <div class="text-slate-500 text-[10px] mt-1 text-slate-400" id="stat-avg-speaking">O'rtacha: 0/100 ball</div>
                     </div>
                 </div>
 
@@ -306,7 +306,7 @@
                             <p class="text-slate-450 text-[11px] mb-4">Talabaning yutuq kartalari</p>
                         </div>
                         <div class="space-y-3 flex-1 overflow-y-auto pr-1" id="achievements-list">
-                            <p class="text-slate-450 text-xs italic">Statistika yuklanganda yutuqlar ko'rsatiladi...</p>
+                            <p class="text-slate-400 text-xs italic">Statistika yuklanganda yutuqlar ko'rsatiladi...</p>
                         </div>
                     </div>
                 </div>
@@ -317,7 +317,7 @@
                 <div class="flex items-center justify-between border-b border-black/5 pb-4">
                     <div>
                         <h2 class="text-2xl font-bold tracking-tight text-slate-900"><i class="fa-solid fa-trophy text-amber-500 mr-2"></i>Peshqadamlar Jadvali</h2>
-                        <p class="text-slate-555 text-xs">Jami to'plangan XP bo'yicha TOP 20 nafar talaba</p>
+                        <p class="text-slate-500 text-xs">Jami to'plangan XP bo'yicha TOP 20 nafar talaba</p>
                     </div>
                     <button onclick="loadLeaderboard()" class="apple-btn-secondary py-2 px-3.5 text-xs flex items-center gap-1.5"><i class="fa-solid fa-rotate-right text-[10px]"></i>Yangilash</button>
                 </div>
@@ -326,14 +326,14 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm border-collapse">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200/60 text-slate-650">
+                                <tr class="bg-slate-50 border-b border-slate-200/60 text-slate-600">
                                     <th class="p-4 text-xs font-bold uppercase tracking-wider">O'rin</th>
                                     <th class="p-4 text-xs font-bold uppercase tracking-wider">Foydalanuvchi nomi</th>
                                     <th class="p-4 text-xs font-bold uppercase tracking-wider text-center">Streak 🔥</th>
                                     <th class="p-4 text-xs font-bold uppercase tracking-wider text-right">To'plangan XP</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-101" id="leaderboard-body">
+                            <tbody class="divide-y divide-slate-100" id="leaderboard-body">
                             </tbody>
                         </table>
                     </div>
@@ -344,7 +344,7 @@
             <section id="tab-mock" class="tab-content hidden space-y-6">
                 <div class="border-b border-black/5 pb-4">
                     <h2 class="text-2xl font-bold tracking-tight text-slate-900"><i class="fa-solid fa-file-invoice text-indigo-500 mr-2"></i>Mock Imtihonlari</h2>
-                    <p class="text-slate-555 text-xs">Loyiha doirasida taqdim etiladigan rasmiy CEFR Mock sinovlari.</p>
+                    <p class="text-slate-500 text-xs">Loyiha doirasida taqdim etiladigan rasmiy CEFR Mock sinovlari.</p>
                 </div>
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" id="mock-list-grid">
                 </div>
@@ -359,11 +359,11 @@
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <h3 class="text-xl font-bold tracking-tight text-slate-900">Admin Panelga Kirish</h3>
-                        <p class="text-slate-450 text-xs mt-1">Tokenni kiriting va boshqaruvni yoqing.</p>
+                        <p class="text-slate-400 text-xs mt-1">Tokenni kiriting va boshqaruvni yoqing.</p>
                     </div>
                     
                     <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-555 uppercase tracking-wider">Xavfsizlik kaliti (Token)</label>
+                        <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">Xavfsizlik kaliti (Token)</label>
                         <input type="password" id="admin-token-input" placeholder="Token kalitini kiriting..." class="apple-input text-xs w-full">
                     </div>
                     
@@ -375,7 +375,7 @@
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
                         <div>
                             <h2 class="text-2xl font-bold text-slate-800 tracking-tight"><i class="fa-solid fa-lock-open mr-2 text-blue-500"></i>Admin Dashboard</h2>
-                            <p class="text-slate-555 text-xs">Savollar, insholar va mock imtihonlarni boshqarish</p>
+                            <p class="text-slate-500 text-xs">Savollar, insholar va mock imtihonlarni boshqarish</p>
                         </div>
                         <button onclick="logoutAdmin()" class="apple-btn-secondary bg-red-50 border-red-200 hover:bg-red-100 text-red-600 py-2 px-4 text-xs font-semibold">Tizimdan chiqish</button>
                     </div>
@@ -423,26 +423,26 @@
                             </div>
 
                             <div id="listening-audio-wrapper" class="hidden space-y-3">
-                                <div class="flex gap-2">
-                                    <button type="button" onclick="toggleAudioInputType('url')" id="btn-audio-type-url" class="apple-btn-secondary py-1 px-3 text-xs bg-slate-100 font-semibold">URL Manzil</button>
-                                    <button type="button" onclick="toggleAudioInputType('file')" id="btn-audio-type-file" class="apple-btn-secondary py-1 px-3 text-xs">Fayl yuklash</button>
-                                </div>
-                                <div id="audio-input-url-container" class="space-y-1">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio link manzili (URL)</label>
-                                    <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="apple-input text-xs w-full">
-                                </div>
-                                <div id="audio-input-file-container" class="hidden space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio faylni tanlang</label>
-                                    <input type="file" id="q-audio-file" accept="audio/*,video/*" class="apple-input text-xs w-full">
-                                    <button type="button" onclick="uploadAudioFile()" class="apple-btn-secondary text-[11px] py-1 px-3">Faylni Serverga yuklash</button>
-                                    <div id="audio-upload-status" class="text-[10px] text-slate-500"></div>
-                                </div>
+                                 <div class="flex gap-2">
+                                     <button type="button" onclick="toggleAudioInputType('url')" id="btn-audio-type-url" class="apple-btn-secondary py-1 px-3 text-xs bg-slate-100 font-semibold">URL Manzil</button>
+                                     <button type="button" onclick="toggleAudioInputType('file')" id="btn-audio-type-file" class="apple-btn-secondary py-1 px-3 text-xs">Fayl yuklash</button>
+                                 </div>
+                                 <div id="audio-input-url-container" class="space-y-1">
+                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio link manzili (URL)</label>
+                                     <input type="text" id="q-audio-url" placeholder="https://example.com/audio.mp3" class="apple-input text-xs w-full">
+                                 </div>
+                                 <div id="audio-input-file-container" class="hidden space-y-2">
+                                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Audio faylni tanlang</label>
+                                     <input type="file" id="q-audio-file" accept="audio/*,video/*" class="apple-input text-xs w-full">
+                                     <button type="button" onclick="uploadAudioFile()" class="apple-btn-secondary text-[11px] py-1 px-3">Faylni Serverga yuklash</button>
+                                     <div id="audio-upload-status" class="text-[10px] text-slate-500"></div>
+                                 </div>
                             </div>
 
                             <!-- Dynamic Questions Builder -->
                             <div class="space-y-4 border-t border-slate-200 pt-5">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-550">Savollar ro'yxati</h4>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Savollar ro'yxati</h4>
                                     <button onclick="addQuestionRow()" class="apple-btn-secondary py-1.5 px-3 text-xs flex items-center gap-1"><i class="fa-solid fa-plus text-[10px]"></i>Savol qo'shish</button>
                                 </div>
                                 <div id="questions-builder-container" class="space-y-4">
@@ -543,28 +543,28 @@
                             
                             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider mb-2">Imtihon nomi</label>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imtihon nomi</label>
                                     <input type="text" id="mock-title" placeholder="Masalan: CEFR Mock Exam #2" class="apple-input text-xs w-full">
                                 </div>
                                 <div>
-                                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider mb-2">Narxi (UZS)</label>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Narxi (UZS)</label>
                                     <input type="number" id="mock-price" value="30000" class="apple-input text-xs w-full">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                                 <div class="space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">1. Reading & Listening testlar</label>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">1. Reading & Listening testlar</label>
                                     <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-questions-picker">
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">2. Writing topshiriq</label>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">2. Writing topshiriq</label>
                                     <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-writings-picker">
                                     </div>
                                 </div>
                                 <div class="space-y-2">
-                                    <label class="block text-[10px] font-bold text-slate-550 uppercase tracking-wider">3. Speaking topshiriq</label>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">3. Speaking topshiriq</label>
                                     <div class="border border-slate-200 rounded-xl p-3 max-h-48 overflow-y-auto space-y-2 bg-slate-50" id="mock-speakings-picker">
                                     </div>
                                 </div>
@@ -610,10 +610,10 @@
     <!-- Global API Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
         <div class="apple-card w-full max-w-sm p-6 space-y-4">
-            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-gear mr-2 text-slate-550"></i>Backend API Sozlamasi</h3>
+            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-gear mr-2 text-slate-500"></i>Backend API Sozlamasi</h3>
             
             <div class="space-y-2">
-                <label class="text-[10px] font-bold text-slate-550 uppercase tracking-wider">Backend URL manzili</label>
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Backend URL manzili</label>
                 <input type="text" id="api-url-input" placeholder="https://example.railway.app" class="apple-input text-xs w-full">
                 <p class="text-[10px] text-slate-400">FastAPI backendining Railway manzilini kiriting.</p>
             </div>
@@ -636,12 +636,20 @@
                 window.Telegram.WebApp.ready();
                 window.Telegram.WebApp.expand();
             }
+            
+            // Parse api_url from URL query params automatically
+            const urlParams = new URLSearchParams(window.location.search);
+            const apiUrlParam = urlParams.get('api_url');
+            if (apiUrlParam) {
+                localStorage.setItem('api_url', apiUrlParam.trim().replace(/\/$/, ""));
+                API_URL = apiUrlParam.trim().replace(/\/$/, "");
+            }
+
             if (!localStorage.getItem('api_url') && !window.location.origin.includes('localhost') && !window.location.origin.includes('127.0.0.1')) {
                 API_URL = window.location.origin;
             }
             document.getElementById('api-url-input').value = API_URL;
 
-            const urlParams = new URLSearchParams(window.location.search);
             const tokenParam = urlParams.get('token');
             if (tokenParam) {
                 localStorage.setItem('admin_token', tokenParam);
@@ -655,6 +663,14 @@
             addQuestionRow();
         });
 
+        function showAlert(message) {
+            if (window.Telegram?.WebApp?.showAlert) {
+                window.Telegram.WebApp.showAlert(message);
+            } else {
+                alert(message);
+            }
+        }
+
         function openSettings() {
             document.getElementById('settings-modal').classList.remove('hidden');
         }
@@ -666,7 +682,7 @@
             localStorage.setItem('api_url', url);
             API_URL = url;
             closeSettings();
-            alert("Sozlamalar saqlandi. API URL: " + API_URL);
+            showAlert("Sozlamalar saqlandi. API URL: " + API_URL);
             const activeTab = document.querySelector('.segmented-btn.active').id.replace('nav-', '');
             switchTab(activeTab);
         }
@@ -704,7 +720,7 @@
         async function loadStatsByInput() {
             const tgId = document.getElementById('stats-tg-id').value.trim();
             if (!tgId) {
-                alert("Iltimos, Telegram ID kiriting.");
+                showAlert("Iltimos, Telegram ID kiriting.");
                 return;
             }
             localStorage.setItem('last_searched_tg_id', tgId);
@@ -737,7 +753,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert(`Kiritilgan Telegram ID (${tgId}) bo'yicha profil topilmadi. Botni ishga tushirib /start bosing.`);
+                showAlert(`Kiritilgan Telegram ID (${tgId}) bo'yicha profil topilmadi. Botni ishga tushirib /start bosing.`);
             }
         }
 
@@ -790,7 +806,7 @@
                 { id: "perfect_score", name: "A'lochi", description: "Testdan 100% natija", iconClass: "fa-solid fa-star text-yellow-500", bgClass: "bg-yellow-50" },
                 { id: "mock_master", name: "Mock Master", description: "Mock imtihon topshirildi", iconClass: "fa-solid fa-graduation-cap text-indigo-500", bgClass: "bg-indigo-50" },
                 { id: "writing_pro", name: "Ijodkor", description: "Yozma topshiriq yakunlandi", iconClass: "fa-solid fa-pen-nib text-purple-500", bgClass: "bg-purple-50" },
-                { id: "speaking_pro", name: "Notiq", description: "Speaking topshiriq yakunlandi", iconClass: "fa-solid fa-microphone text-rose-550", bgClass: "bg-rose-50" }
+                { id: "speaking_pro", name: "Notiq", description: "Speaking topshiriq yakunlandi", iconClass: "fa-solid fa-microphone text-rose-505", bgClass: "bg-rose-50" }
             ];
 
             allAchievements.forEach(ach => {
@@ -803,7 +819,7 @@
                         </div>
                         <div>
                             <h4 class="text-xs font-bold text-slate-800">${ach.name}</h4>
-                            <p class="text-[10px] text-slate-505">${ach.description}</p>
+                            <p class="text-[10px] text-slate-500">${ach.description}</p>
                         </div>
                     </div>
                 `;
@@ -824,7 +840,7 @@
 
                 const medal_icons = {
                     1: '<div class="w-7 h-7 rounded-full bg-yellow-50 border border-yellow-250 flex items-center justify-center"><i class="fa-solid fa-trophy text-yellow-600 text-xs"></i></div>',
-                    2: '<div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center"><i class="fa-solid fa-trophy text-slate-505 text-xs"></i></div>',
+                    2: '<div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center"><i class="fa-solid fa-trophy text-slate-500 text-xs"></i></div>',
                     3: '<div class="w-7 h-7 rounded-full bg-amber-50 border border-amber-250 flex items-center justify-center"><i class="fa-solid fa-trophy text-amber-700 text-xs"></i></div>'
                 };
 
@@ -871,7 +887,7 @@
                                     <li class="flex items-center gap-2"><i class="fa-solid fa-circle-check text-rose-500 text-[10px]"></i><span>Speaking: ${mock.speaking_count} ta savol</span></li>
                                 </ul>
                             </div>
-                            <button onclick="alert('Imtihonni topshirish uchun Telegram botimizga kiring!')" class="w-full apple-btn-primary py-2 text-xs font-semibold mt-4">Botda topshirish</button>
+                            <button onclick="showAlert('Imtihonni topshirish uchun Telegram botimizga kiring!')" class="w-full apple-btn-primary py-2 text-xs font-semibold mt-4">Botda topshirish</button>
                         </div>
                     `;
                 });
@@ -901,7 +917,7 @@
         function loginAdmin() {
             const token = document.getElementById('admin-token-input').value.trim();
             if (!token) {
-                alert("Iltimos token kiriting.");
+                showAlert("Iltimos token kiriting.");
                 return;
             }
             localStorage.setItem('admin_token', token);
@@ -968,11 +984,11 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    alert("O'chirildi!");
+                    showAlert("O'chirildi!");
                     loadAdminQuestions();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1007,7 +1023,7 @@
             const statusDiv = document.getElementById('audio-upload-status');
             
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert("Iltimos fayl tanlang.");
+                showAlert("Iltimos fayl tanlang.");
                 return;
             }
             
@@ -1064,8 +1080,8 @@
             row.className = "p-4 border border-slate-200 rounded-2xl space-y-3 bg-slate-50/50 question-row";
             row.innerHTML = `
                 <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                    <h5 class="text-xs font-bold text-slate-550">Savol #${idx}</h5>
-                    <button onclick="this.closest('.question-row').remove()" class="text-slate-400 hover:text-red-550 text-xs"><i class="fa-solid fa-times mr-1"></i>O'chirish</button>
+                    <h5 class="text-xs font-bold text-slate-500">Savol #${idx}</h5>
+                    <button onclick="this.closest('.question-row').remove()" class="text-slate-400 hover:text-red-500 text-xs"><i class="fa-solid fa-times mr-1"></i>O'chirish</button>
                 </div>
                 <div class="space-y-2">
                     <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Savol matni</label>
@@ -1098,7 +1114,7 @@
             const audioUrl = uploadedAudioUrl ? uploadedAudioUrl : audioUrlInput;
             
             if (!title) {
-                alert("Sarlavhani kiriting.");
+                showAlert("Sarlavhani kiriting.");
                 return;
             }
             
@@ -1114,7 +1130,7 @@
                 const answer = row.querySelector('select').value;
                 
                 if (!qText || !optA || !optB) {
-                    alert(`Savol #${i+1} ni to'liq to'ldiring.`);
+                    showAlert(`Savol #${i+1} ni to'liq to'ldiring.`);
                     return;
                 }
                 questionsList.push({
@@ -1126,7 +1142,7 @@
             }
 
             if (questionsList.length === 0) {
-                alert("Kamida bitta savol qo'shing.");
+                showAlert("Kamida bitta savol qo'shing.");
                 return;
             }
 
@@ -1150,7 +1166,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    alert("Test saqlandi!");
+                    showAlert("Test saqlandi!");
                     document.getElementById('q-title').value = '';
                     document.getElementById('q-text').value = '';
                     document.getElementById('q-audio-url').value = '';
@@ -1165,10 +1181,10 @@
                     loadAdminQuestions();
                 } else {
                     const data = await response.json();
-                    alert("Xatolik: " + data.detail);
+                    showAlert("Xatolik: " + data.detail);
                 }
             } catch (err) {
-                alert("API ulanish xatosi.");
+                showAlert("API ulanish xatosi.");
             }
         }
 
@@ -1193,7 +1209,7 @@
                                 <h4 class="font-bold text-xs text-slate-800">${w.title} (${w.level})</h4>
                                 <p class="text-[10px] text-slate-500 truncate max-w-xs">${w.prompt}</p>
                             </div>
-                            <button onclick="deleteTask('writing', ${w.id})" class="text-red-500 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteTask('writing', ${w.id})" class="text-red-505 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
                         </li>
                     `;
                 });
@@ -1207,7 +1223,7 @@
                                 <h4 class="font-bold text-xs text-slate-800">${s.title} (Part ${s.part} — ${s.level})</h4>
                                 <p class="text-[10px] text-slate-500 truncate max-w-xs">${s.prompt}</p>
                             </div>
-                            <button onclick="deleteTask('speaking', ${s.id})" class="text-red-500 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
+                            <button onclick="deleteTask('speaking', ${s.id})" class="text-red-505 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
                         </li>
                     `;
                 });
@@ -1225,11 +1241,11 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    alert("O'chirildi!");
+                    showAlert("O'chirildi!");
                     loadAdminTasks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1251,7 +1267,7 @@
             const prompt = document.getElementById('task-prompt').value.trim();
             
             if (!title || !prompt) {
-                alert("Sarlavha va promptni to'ldiring.");
+                showAlert("Sarlavha va promptni to'ldiring.");
                 return;
             }
 
@@ -1269,13 +1285,13 @@
                     body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    alert("Topshiriq saqlandi!");
+                    showAlert("Topshiriq saqlandi!");
                     document.getElementById('task-title').value = '';
                     document.getElementById('task-prompt').value = '';
                     loadAdminTasks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1298,7 +1314,7 @@
                             <td class="p-3 text-slate-600">${m.writing_ids.length} ta</td>
                             <td class="p-3 text-slate-600">${m.speaking_ids.length} ta</td>
                             <td class="p-3 text-right">
-                                <button onclick="deleteMock(${m.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="deleteMock(${m.id})" class="text-red-500 hover:text-red-750 transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
                     `;
@@ -1316,11 +1332,11 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    alert("O'chirildi!");
+                    showAlert("O'chirildi!");
                     loadAdminMocks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
 
@@ -1366,7 +1382,7 @@
             const price = parseInt(document.getElementById('mock-price').value) || 0;
             
             if (!title) {
-                alert("Sarlavha yozing.");
+                showAlert("Sarlavha yozing.");
                 return;
             }
 
@@ -1375,7 +1391,7 @@
             const speaking_ids = Array.from(document.querySelectorAll('.mock-s-checkbox:checked')).map(el => parseInt(el.value));
 
             if (questions_ids.length === 0 && writing_ids.length === 0 && speaking_ids.length === 0) {
-                alert("Kamida bitta topshiriq tanlang.");
+                showAlert("Kamida bitta topshiriq tanlang.");
                 return;
             }
 
@@ -1391,14 +1407,14 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    alert("Mock Imtihoni yaratildi!");
+                    showAlert("Mock Imtihoni yaratildi!");
                     document.getElementById('mock-title').value = '';
                     document.getElementById('mock-price').value = '30000';
                     document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => el.checked = false);
                     loadAdminMocks();
                 }
             } catch (err) {
-                alert("Xatolik.");
+                showAlert("Xatolik.");
             }
         }
     </script>
