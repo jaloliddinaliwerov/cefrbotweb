@@ -215,9 +215,15 @@
 
                 <!-- 1. Reading / Listening Manager -->
                 <div id="admin-sub-questions" class="admin-sub-content space-y-6">
-                    <!-- Add Form -->
+                    <!-- Add/Edit Form -->
                     <div class="apple-card p-6 space-y-5">
-                        <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>Yangi test qo'shish</h3>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800">
+                                <i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>
+                                Yangi test qo'shish <span id="q-form-mode-text" class="text-xs font-semibold text-slate-500 ml-1"></span>
+                            </h3>
+                            <button type="button" onclick="resetQuestionForm()" id="q-btn-cancel" class="apple-btn-secondary py-1 px-3 text-xs hidden">Bekor qilish</button>
+                        </div>
                         
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
@@ -286,7 +292,7 @@
                                         <th class="p-3 text-xs font-bold uppercase tracking-wider">Part</th>
                                         <th class="p-3 text-xs font-bold uppercase tracking-wider">Sarlavha</th>
                                         <th class="p-3 text-xs font-bold uppercase tracking-wider text-center">Savollar</th>
-                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">O'chirish</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">Amallar</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-questions-tbody" class="divide-y divide-slate-100">
@@ -298,9 +304,15 @@
 
                 <!-- 2. Writing / Speaking Task Manager -->
                 <div id="admin-sub-writing" class="admin-sub-content hidden space-y-6">
-                    <!-- Add Form -->
+                    <!-- Add/Edit Form -->
                     <div class="apple-card p-6 space-y-4">
-                        <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>Yangi yozish / gapirish topshirig'i</h3>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800">
+                                <i class="fa-solid fa-plus-circle text-blue-500 mr-2"></i>
+                                Yangi yozish / gapirish topshirig'i <span id="task-form-mode-text" class="text-xs font-semibold text-slate-500 ml-1"></span>
+                            </h3>
+                            <button type="button" onclick="resetTaskForm()" id="task-btn-cancel" class="apple-btn-secondary py-1 px-3 text-xs hidden">Bekor qilish</button>
+                        </div>
                         
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
@@ -357,9 +369,15 @@
 
                 <!-- 3. Mock Exam Manager -->
                 <div id="admin-sub-mocks" class="admin-sub-content hidden space-y-6">
-                    <!-- Add Form -->
+                    <!-- Add/Edit Form -->
                     <div class="apple-card p-6 space-y-5">
-                        <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-cubes text-blue-500 mr-2"></i>Yangi Mock Imtihoni Yaratish</h3>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800">
+                                <i class="fa-solid fa-cubes text-blue-500 mr-2"></i>
+                                Yangi Mock Imtihoni Yaratish <span id="mock-form-mode-text" class="text-xs font-semibold text-slate-500 ml-1"></span>
+                            </h3>
+                            <button type="button" onclick="resetMockForm()" id="mock-btn-cancel" class="apple-btn-secondary py-1 px-3 text-xs hidden">Bekor qilish</button>
+                        </div>
                         
                         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
@@ -408,7 +426,7 @@
                                         <th class="p-3 text-xs font-bold uppercase tracking-wider">R/L testlar</th>
                                         <th class="p-3 text-xs font-bold uppercase tracking-wider">W topshiriq</th>
                                         <th class="p-3 text-xs font-bold uppercase tracking-wider">S topshiriq</th>
-                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">O'chirish</th>
+                                        <th class="p-3 text-xs font-bold uppercase tracking-wider text-right">Amallar</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-mocks-tbody" class="divide-y divide-slate-100">
@@ -479,6 +497,18 @@
     <script>
         let API_URL = localStorage.getItem('api_url') || window.location.origin;
         let adminToken = localStorage.getItem('admin_token') || '';
+
+        // Data arrays for editing
+        let adminQuestions = [];
+        let adminWritings = [];
+        let adminSpeakings = [];
+        let adminMocks = [];
+
+        // Editing state IDs
+        let editingQuestionId = null;
+        let editingTaskId = null;
+        let editingTaskType = null;
+        let editingMockId = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (window.Telegram?.WebApp) {
@@ -652,6 +682,7 @@
                 });
                 if (!response.ok) throw new Error();
                 const data = await response.json();
+                adminQuestions = data;
                 
                 const tbody = document.getElementById('admin-questions-tbody');
                 tbody.innerHTML = '';
@@ -665,6 +696,7 @@
                             <td class="p-3 text-slate-800 font-semibold">${q.title}</td>
                             <td class="p-3 text-center text-slate-700 font-bold">${q.questions_json.length} ta</td>
                             <td class="p-3 text-right">
+                                <button onclick="editQuestionById(${q.id})" class="text-blue-500 hover:text-blue-750 mr-2 transition"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <button onclick="deleteQuestion(${q.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
@@ -674,6 +706,91 @@
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        function resetQuestionForm() {
+            editingQuestionId = null;
+            document.getElementById('q-form-mode-text').innerText = '';
+            document.getElementById('q-btn-cancel').classList.add('hidden');
+            document.getElementById('q-title').value = '';
+            document.getElementById('q-text').value = '';
+            document.getElementById('q-audio-url').value = '';
+            uploadedAudioUrl = "";
+            const fileInput = document.getElementById('q-audio-file');
+            if (fileInput) fileInput.value = "";
+            const statusDiv = document.getElementById('audio-upload-status');
+            if (statusDiv) statusDiv.innerHTML = "";
+            toggleAudioInputType('url');
+            document.getElementById('questions-builder-container').innerHTML = '';
+            addQuestionRow();
+        }
+
+        function editQuestionById(id) {
+            const q = adminQuestions.find(item => item.id === id);
+            if (!q) return;
+            
+            editingQuestionId = q.id;
+            document.getElementById('q-form-mode-text').innerText = `(Tahrirlash ID: ${q.id})`;
+            document.getElementById('q-btn-cancel').classList.remove('hidden');
+            
+            document.getElementById('q-section').value = q.section;
+            document.getElementById('q-part').value = q.part;
+            document.getElementById('q-title').value = q.title;
+            toggleQuestionFields();
+            
+            if (q.section === 'reading') {
+                document.getElementById('q-text').value = q.text || '';
+            } else {
+                if (q.audio_url && q.audio_url.startsWith('/uploads')) {
+                    toggleAudioInputType('file');
+                    uploadedAudioUrl = q.audio_url;
+                    document.getElementById('audio-upload-status').innerHTML = 'Audio bog\'langan! <i class="fa-solid fa-circle-check text-emerald-500 ml-1"></i>';
+                } else {
+                    toggleAudioInputType('url');
+                    document.getElementById('q-audio-url').value = q.audio_url || '';
+                }
+            }
+            
+            const container = document.getElementById('questions-builder-container');
+            container.innerHTML = '';
+            q.questions_json.forEach((item, idx) => {
+                const optA = (item.options[0] || '').replace(/^A:\s*/, '');
+                const optB = (item.options[1] || '').replace(/^B:\s*/, '');
+                const optC = (item.options[2] || '').replace(/^C:\s*/, '');
+                const optD = (item.options[3] || '').replace(/^D:\s*/, '');
+                
+                const row = document.createElement('div');
+                row.className = "p-4 border border-slate-200 rounded-2xl space-y-3 bg-slate-50/50 question-row";
+                row.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h5 class="text-xs font-bold text-slate-500">Savol #${idx + 1}</h5>
+                        <button onclick="this.closest('.question-row').remove()" class="text-slate-400 hover:text-red-500 text-xs"><i class="fa-solid fa-times mr-1"></i>O'chirish</button>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Savol matni</label>
+                        <input type="text" value="${item.q}" placeholder="Savolni yozing..." class="apple-input text-xs w-full py-1.5">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" value="${optA}" placeholder="A variant" class="apple-input text-xs w-full py-1.5 row-opt-a">
+                        <input type="text" value="${optB}" placeholder="B variant" class="apple-input text-xs w-full py-1.5 row-opt-b">
+                        <input type="text" value="${optC}" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-c">
+                        <input type="text" value="${optD}" placeholder="D variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
+                    </div>
+                    <div class="w-1/3">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">To'g'ri javob</label>
+                        <select class="apple-input text-xs w-full py-1">
+                            <option value="A" ${item.answer === 'A' ? 'selected' : ''}>A</option>
+                            <option value="B" ${item.answer === 'B' ? 'selected' : ''}>B</option>
+                            <option value="C" ${item.answer === 'C' ? 'selected' : ''}>C</option>
+                            <option value="D" ${item.answer === 'D' ? 'selected' : ''}>D</option>
+                        </select>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+            
+            // Scroll to form smoothly
+            document.getElementById('q-section').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function deleteQuestion(id) {
@@ -722,7 +839,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" placeholder="A variant" class="apple-input text-xs w-full py-1.5 row-opt-a">
                     <input type="text" placeholder="B variant" class="apple-input text-xs w-full py-1.5 row-opt-b">
-                    <input type="text" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
+                    <input type="text" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-c">
                     <input type="text" placeholder="D variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
                 </div>
                 <div class="w-1/3">
@@ -857,9 +974,14 @@
                 is_mock: false
             };
 
+            const url = editingQuestionId
+                ? `${API_URL}/api/admin/questions/${editingQuestionId}`
+                : `${API_URL}/api/admin/questions`;
+            const method = editingQuestionId ? 'PUT' : 'POST';
+
             try {
-                const response = await fetch(`${API_URL}/api/admin/questions`, {
-                    method: 'POST',
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${adminToken}`
@@ -867,18 +989,8 @@
                     body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    showAlert("Test saqlandi!");
-                    document.getElementById('q-title').value = '';
-                    document.getElementById('q-text').value = '';
-                    document.getElementById('q-audio-url').value = '';
-                    uploadedAudioUrl = "";
-                    const fileInput = document.getElementById('q-audio-file');
-                    if (fileInput) fileInput.value = "";
-                    const statusDiv = document.getElementById('audio-upload-status');
-                    if (statusDiv) statusDiv.innerHTML = "";
-                    toggleAudioInputType('url');
-                    document.getElementById('questions-builder-container').innerHTML = '';
-                    addQuestionRow();
+                    showAlert(editingQuestionId ? "Test muvaffaqiyatli tahrirlandi!" : "Test saqlandi!");
+                    resetQuestionForm();
                     loadAdminQuestions();
                 } else {
                     const data = await response.json();
@@ -895,22 +1007,27 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 const writings = await w_res.json();
+                adminWritings = writings;
                 
                 const s_res = await fetch(`${API_URL}/api/admin/speaking-tasks`, {
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 const speakings = await s_res.json();
+                adminSpeakings = speakings;
 
                 const w_ul = document.getElementById('admin-writings-ul');
                 w_ul.innerHTML = writings.length === 0 ? '<li class="text-slate-400 italic text-xs">Topshiriqlar mavjud emas.</li>' : '';
                 writings.forEach(w => {
                     w_ul.innerHTML += `
-                        <li class="flex items-center justify-between p-3.5 border border-slate-100 rounded-2xl bg-white">
+                        <li class="flex items-center justify-between p-3.5 border border-slate-100 rounded-2xl bg-white shadow-sm">
                             <div>
                                 <h4 class="font-bold text-xs text-slate-800">${w.title} (${w.level})</h4>
                                 <p class="text-[10px] text-slate-500 truncate max-w-xs">${w.prompt}</p>
                             </div>
-                            <button onclick="deleteTask('writing', ${w.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
+                            <div>
+                                <button onclick="editTask('writing', ${w.id})" class="text-blue-500 hover:text-blue-750 mr-2 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteTask('writing', ${w.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </li>
                     `;
                 });
@@ -919,12 +1036,15 @@
                 s_ul.innerHTML = speakings.length === 0 ? '<li class="text-slate-400 italic text-xs">Topshiriqlar mavjud emas.</li>' : '';
                 speakings.forEach(s => {
                     s_ul.innerHTML += `
-                        <li class="flex items-center justify-between p-3.5 border border-slate-100 rounded-2xl bg-white">
+                        <li class="flex items-center justify-between p-3.5 border border-slate-100 rounded-2xl bg-white shadow-sm">
                             <div>
                                 <h4 class="font-bold text-xs text-slate-800">${s.title} (Part ${s.part} — ${s.level})</h4>
                                 <p class="text-[10px] text-slate-500 truncate max-w-xs">${s.prompt}</p>
                             </div>
-                            <button onclick="deleteTask('speaking', ${s.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
+                            <div>
+                                <button onclick="editTask('speaking', ${s.id})" class="text-blue-500 hover:text-blue-750 mr-2 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button onclick="deleteTask('speaking', ${s.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </li>
                     `;
                 });
@@ -932,6 +1052,39 @@
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        function resetTaskForm() {
+            editingTaskId = null;
+            editingTaskType = null;
+            document.getElementById('task-form-mode-text').innerText = '';
+            document.getElementById('task-btn-cancel').classList.add('hidden');
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-prompt').value = '';
+        }
+
+        function editTask(type, id) {
+            const task = type === 'writing'
+                ? adminWritings.find(t => t.id === id)
+                : adminSpeakings.find(t => t.id === id);
+            if (!task) return;
+            
+            editingTaskId = task.id;
+            editingTaskType = type;
+            document.getElementById('task-form-mode-text').innerText = `(Tahrirlash ID: ${task.id})`;
+            document.getElementById('task-btn-cancel').classList.remove('hidden');
+            
+            document.getElementById('task-type').value = type;
+            document.getElementById('task-level').value = task.level;
+            document.getElementById('task-title').value = task.title;
+            document.getElementById('task-prompt').value = task.prompt;
+            
+            toggleTaskFields();
+            if (type === 'speaking') {
+                document.getElementById('task-part').value = task.part;
+            }
+            
+            document.getElementById('task-type').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function deleteTask(type, id) {
@@ -976,9 +1129,14 @@
                 ? { title, prompt, part, level, is_mock: false }
                 : { title, prompt, level, is_mock: false };
 
+            const url = editingTaskId
+                ? `${API_URL}/api/admin/${editingTaskType}-tasks/${editingTaskId}`
+                : `${API_URL}/api/admin/${type}-tasks`;
+            const method = editingTaskId ? 'PUT' : 'POST';
+
             try {
-                const response = await fetch(`${API_URL}/api/admin/${type}-tasks`, {
-                    method: 'POST',
+                const response = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${adminToken}`
@@ -986,9 +1144,8 @@
                     body: JSON.stringify(payload)
                 });
                 if (response.ok) {
-                    showAlert("Topshiriq saqlandi!");
-                    document.getElementById('task-title').value = '';
-                    document.getElementById('task-prompt').value = '';
+                    showAlert(editingTaskId ? "Topshiriq tahrirlandi!" : "Topshiriq saqlandi!");
+                    resetTaskForm();
                     loadAdminTasks();
                 }
             } catch (err) {
@@ -1002,6 +1159,7 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 const mocks = await res.json();
+                adminMocks = mocks;
                 const tbody = document.getElementById('admin-mocks-tbody');
                 tbody.innerHTML = '';
 
@@ -1015,6 +1173,7 @@
                             <td class="p-3 text-slate-600">${m.writing_ids.length} ta</td>
                             <td class="p-3 text-slate-600">${m.speaking_ids.length} ta</td>
                             <td class="p-3 text-right">
+                                <button onclick="editMockExam(${m.id})" class="text-blue-500 hover:text-blue-750 mr-2 transition"><i class="fa-solid fa-pen-to-square"></i></button>
                                 <button onclick="deleteMock(${m.id})" class="text-red-500 hover:text-red-755 transition"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
@@ -1023,6 +1182,40 @@
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        function resetMockForm() {
+            editingMockId = null;
+            document.getElementById('mock-form-mode-text').innerText = '';
+            document.getElementById('mock-btn-cancel').classList.add('hidden');
+            document.getElementById('mock-title').value = '';
+            document.getElementById('mock-price').value = '30000';
+            document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => el.checked = false);
+        }
+
+        function editMockExam(id) {
+            const mock = adminMocks.find(m => m.id === id);
+            if (!mock) return;
+            
+            editingMockId = mock.id;
+            document.getElementById('mock-form-mode-text').innerText = `(Tahrirlash ID: ${mock.id})`;
+            document.getElementById('mock-btn-cancel').classList.remove('hidden');
+            
+            document.getElementById('mock-title').value = mock.title;
+            document.getElementById('mock-price').value = mock.price;
+            
+            document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => {
+                const val = parseInt(el.value);
+                if (el.classList.contains('mock-q-checkbox')) {
+                    el.checked = mock.questions_ids.includes(val);
+                } else if (el.classList.contains('mock-w-checkbox')) {
+                    el.checked = mock.writing_ids.includes(val);
+                } else if (el.classList.contains('mock-s-checkbox')) {
+                    el.checked = mock.speaking_ids.includes(val);
+                }
+            });
+            
+            document.getElementById('mock-title').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function deleteMock(id) {
@@ -1098,9 +1291,14 @@
 
             const payload = { title, price, questions_ids, writing_ids, speaking_ids, active: true };
 
+            const url = editingMockId
+                ? `${API_URL}/api/admin/mock-exams/${editingMockId}`
+                : `${API_URL}/api/admin/mock-exams`;
+            const method = editingMockId ? 'PUT' : 'POST';
+
             try {
-                const res = await fetch(`${API_URL}/api/admin/mock-exams`, {
-                    method: 'POST',
+                const res = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${adminToken}`
@@ -1108,10 +1306,8 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    showAlert("Mock Imtihoni yaratildi!");
-                    document.getElementById('mock-title').value = '';
-                    document.getElementById('mock-price').value = '30000';
-                    document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => el.checked = false);
+                    showAlert(editingMockId ? "Mock Imtihoni muvaffaqiyatli tahrirlandi!" : "Mock Imtihoni yaratildi!");
+                    resetMockForm();
                     loadAdminMocks();
                 }
             } catch (err) {
