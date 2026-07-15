@@ -251,12 +251,20 @@
                             <button type="button" onclick="resetQuestionForm()" id="q-btn-cancel" class="apple-btn-secondary py-1 px-3 text-xs hidden">Bekor qilish</button>
                         </div>
                         
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Bo'lim</label>
                                 <select id="q-section" onchange="toggleQuestionFields()" class="apple-input text-xs w-full">
                                     <option value="reading">Reading</option>
                                     <option value="listening">Listening</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Turi (Tizimda roli)</label>
+                                <select id="q-type" class="apple-input text-xs w-full">
+                                    <option value="practice">Oddiy Mashq (Practice)</option>
+                                    <option value="daily">Kunlik Vazifa (Daily Challenge)</option>
+                                    <option value="mock">Mock Imtihon Savoli</option>
                                 </select>
                             </div>
                             <div>
@@ -940,12 +948,18 @@
                 tbody.innerHTML = '';
 
                 data.forEach(q => {
+                    let roleBadge = '<span class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 text-[9px] font-bold border border-blue-100 ml-1.5">Practice</span>';
+                    if (q.is_mock) {
+                        roleBadge = '<span class="px-1.5 py-0.5 rounded bg-purple-50 text-purple-600 text-[9px] font-bold border border-purple-100 ml-1.5">Mock</span>';
+                    } else if (q.is_daily) {
+                        roleBadge = '<span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 text-[9px] font-bold border border-rose-100 ml-1.5">Daily Challenge</span>';
+                    }
                     tbody.innerHTML += `
                         <tr class="hover:bg-slate-50 transition border-b border-slate-100">
                             <td class="p-3 font-semibold text-slate-400">${q.id}</td>
                             <td class="p-3 text-slate-700 capitalize font-semibold">${q.section}</td>
                             <td class="p-3 text-slate-600">Part ${q.part}</td>
-                            <td class="p-3 text-slate-800 font-semibold">${q.title}</td>
+                            <td class="p-3 text-slate-800 font-semibold flex items-center">${q.title} ${roleBadge}</td>
                             <td class="p-3 text-center text-slate-700 font-bold">${q.questions_json.length} ta</td>
                             <td class="p-3 text-right">
                                 <button onclick="editQuestionById(${q.id})" class="text-blue-500 hover:text-blue-750 mr-2 transition"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -965,6 +979,7 @@
             document.getElementById('q-form-mode-text').innerText = '';
             document.getElementById('q-btn-cancel').classList.add('hidden');
             document.getElementById('q-title').value = '';
+            document.getElementById('q-type').value = 'practice';
             document.getElementById('q-text').value = '';
             document.getElementById('q-audio-url').value = '';
             uploadedAudioUrl = "";
@@ -986,6 +1001,13 @@
             document.getElementById('q-btn-cancel').classList.remove('hidden');
             
             document.getElementById('q-section').value = q.section;
+            if (q.is_mock) {
+                document.getElementById('q-type').value = 'mock';
+            } else if (q.is_daily) {
+                document.getElementById('q-type').value = 'daily';
+            } else {
+                document.getElementById('q-type').value = 'practice';
+            }
             document.getElementById('q-part').value = q.part;
             document.getElementById('q-title').value = q.title;
             toggleQuestionFields();
@@ -1216,6 +1238,10 @@
                 return;
             }
 
+            const qType = document.getElementById('q-type').value;
+            const isMock = qType === 'mock';
+            const isDaily = qType === 'daily';
+
             const payload = {
                 section,
                 part,
@@ -1223,7 +1249,8 @@
                 text: section === 'reading' ? text : null,
                 audio_url: section === 'listening' ? audioUrl : null,
                 questions_json: questionsList,
-                is_mock: false
+                is_mock: isMock,
+                is_daily: isDaily
             };
 
             const url = editingQuestionId
