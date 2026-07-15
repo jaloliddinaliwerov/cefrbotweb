@@ -229,10 +229,7 @@
                         <i class="fa-solid fa-layer-group mr-1.5"></i>Mock Exams Builder
                     </button>
                     <button onclick="switchAdminSubTab('users')" id="admin-sub-nav-users" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
-                        <i class="fa-solid fa-users mr-1.5"></i>O'quvchilar & Ovozlar
-                    </button>
-                    <button onclick="switchAdminSubTab('payments')" id="admin-sub-nav-payments" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
-                        <i class="fa-solid fa-credit-card mr-1.5"></i>To'lovlar
+                        <i class="fa-solid fa-users mr-1.5"></i>O'quvchilar
                     </button>
                     <button onclick="switchAdminSubTab('settings')" id="admin-sub-nav-settings" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
                         <i class="fa-solid fa-gear mr-1.5"></i>Sozlamalar
@@ -472,7 +469,7 @@
 
                 <!-- 4. Users & Speaking Submissions Manager -->
                 <div id="admin-sub-users" class="admin-sub-content hidden space-y-6">
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div class="grid grid-cols-1 gap-6">
                         <!-- Users List Card -->
                         <div class="apple-card p-6 space-y-4">
                             <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-graduation-cap text-blue-500 mr-2"></i>O'quvchilar ro'yxati</h3>
@@ -491,33 +488,10 @@
                                 </table>
                             </div>
                         </div>
-
-                        <!-- Speaking Submissions List Card -->
-                        <div class="apple-card p-6 space-y-4">
-                            <h3 class="text-md font-bold tracking-tight text-slate-800"><i class="fa-solid fa-microphone text-rose-500 mr-2"></i>Speaking javoblari (Ovozlar)</h3>
-                            <div class="space-y-4 overflow-y-auto max-h-96 pr-1" id="admin-speaking-submissions-container">
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- 5. To'lovlar (Pending Payments) -->
-                <div id="admin-sub-payments" class="admin-sub-content hidden space-y-6">
-                    <div class="apple-card p-6 space-y-4">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-md font-bold tracking-tight text-slate-800">
-                                <i class="fa-solid fa-credit-card text-emerald-500 mr-2"></i>
-                                Kutilayotgan To'lovlar
-                            </h3>
-                            <button onclick="loadPendingPayments()" class="apple-btn-secondary py-1 px-3 text-xs">
-                                <i class="fa-solid fa-rotate mr-1"></i>Yangilash
-                            </button>
-                        </div>
-                        <div id="admin-payments-list" class="space-y-3">
-                            <p class="text-xs text-slate-400 text-center py-4">Yuklanmoqda...</p>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- 6. Sozlamalar (Settings) -->
                 <div id="admin-sub-settings" class="admin-sub-content hidden space-y-6">
@@ -697,7 +671,6 @@
             document.getElementById(`admin-sub-nav-${subName}`).classList.add('active');
 
             // Auto-load on tab switch
-            if (subName === 'payments') loadPendingPayments();
             if (subName === 'settings') loadCardSettings();
         }
 
@@ -755,7 +728,6 @@
             loadAdminTasks();
             loadAdminMocks();
             loadAdminUsers();
-            loadAdminSpeakingSubmissions();
             loadCardSettings();
         }
 
