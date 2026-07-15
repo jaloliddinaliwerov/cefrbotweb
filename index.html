@@ -1033,10 +1033,12 @@
             const container = document.getElementById('questions-builder-container');
             container.innerHTML = '';
             q.questions_json.forEach((item, idx) => {
-                const optA = (item.options[0] || '').replace(/^A:\s*/, '');
-                const optB = (item.options[1] || '').replace(/^B:\s*/, '');
-                const optC = (item.options[2] || '').replace(/^C:\s*/, '');
-                const optD = (item.options[3] || '').replace(/^D:\s*/, '');
+                const isSA = !item.options || item.options.length === 0;
+                
+                const optA = !isSA ? (item.options[0] || '').replace(/^A:\s*/, '') : '';
+                const optB = !isSA ? (item.options[1] || '').replace(/^B:\s*/, '') : '';
+                const optC = !isSA ? (item.options[2] || '').replace(/^C:\s*/, '') : '';
+                const optD = !isSA ? (item.options[3] || '').replace(/^D:\s*/, '') : '';
                 
                 const row = document.createElement('div');
                 row.className = "p-4 border border-slate-200 rounded-2xl space-y-3 bg-slate-50/50 question-row";
@@ -1045,24 +1047,38 @@
                         <h5 class="text-xs font-bold text-slate-500">Savol #${idx + 1}</h5>
                         <button onclick="this.closest('.question-row').remove()" class="text-slate-400 hover:text-red-500 text-xs"><i class="fa-solid fa-times mr-1"></i>O'chirish</button>
                     </div>
-                    <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Savol matni</label>
-                        <input type="text" value="${item.q}" placeholder="Savolni yozing..." class="apple-input text-xs w-full py-1.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Savol matni</label>
+                            <input type="text" value="${item.q}" placeholder="Savolni yozing..." class="apple-input text-xs w-full py-1.5 row-q-text">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Savol Turi</label>
+                            <select onchange="toggleRowQuestionType(this)" class="apple-input text-xs w-full py-1.5 row-q-type">
+                                <option value="mc" ${!isSA ? 'selected' : ''}>Variantli (Multiple Choice)</option>
+                                <option value="sa" ${isSA ? 'selected' : ''}>Matnli javob (Short Answer)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+                    
+                    <!-- Options Grid for Multiple Choice -->
+                    <div class="grid grid-cols-2 gap-2 row-options-grid ${isSA ? 'hidden' : ''}">
                         <input type="text" value="${optA}" placeholder="A variant" class="apple-input text-xs w-full py-1.5 row-opt-a">
                         <input type="text" value="${optB}" placeholder="B variant" class="apple-input text-xs w-full py-1.5 row-opt-b">
                         <input type="text" value="${optC}" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-c">
                         <input type="text" value="${optD}" placeholder="D variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
                     </div>
-                    <div class="w-1/3">
-                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">To'g'ri javob</label>
-                        <select class="apple-input text-xs w-full py-1">
+
+                    <!-- Answer Container (Select for MC, Text Input for SA) -->
+                    <div class="w-full sm:w-1/2 row-answer-container">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">To'g'ri javob</label>
+                        <select class="apple-input text-xs w-full py-1.5 row-correct-select ${isSA ? 'hidden' : ''}">
                             <option value="A" ${item.answer === 'A' ? 'selected' : ''}>A</option>
                             <option value="B" ${item.answer === 'B' ? 'selected' : ''}>B</option>
                             <option value="C" ${item.answer === 'C' ? 'selected' : ''}>C</option>
                             <option value="D" ${item.answer === 'D' ? 'selected' : ''}>D</option>
                         </select>
+                        <input type="text" value="${isSA ? item.answer : ''}" placeholder="To'g'ri javobni yozing (masalan: Apple)" class="apple-input text-xs w-full py-1.5 row-correct-input ${!isSA ? 'hidden' : ''}">
                     </div>
                 `;
                 container.appendChild(row);
@@ -1111,27 +1127,58 @@
                     <h5 class="text-xs font-bold text-slate-500">Savol #${idx}</h5>
                     <button onclick="this.closest('.question-row').remove()" class="text-slate-400 hover:text-red-500 text-xs"><i class="fa-solid fa-times mr-1"></i>O'chirish</button>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Savol matni</label>
-                    <input type="text" placeholder="Savolni yozing..." class="apple-input text-xs w-full py-1.5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Savol matni</label>
+                        <input type="text" placeholder="Savolni yozing..." class="apple-input text-xs w-full py-1.5 row-q-text">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Savol Turi</label>
+                        <select onchange="toggleRowQuestionType(this)" class="apple-input text-xs w-full py-1.5 row-q-type">
+                            <option value="mc">Variantli (Multiple Choice)</option>
+                            <option value="sa">Matnli javob (Short Answer)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2">
+                
+                <!-- Options Grid for Multiple Choice -->
+                <div class="grid grid-cols-2 gap-2 row-options-grid">
                     <input type="text" placeholder="A variant" class="apple-input text-xs w-full py-1.5 row-opt-a">
                     <input type="text" placeholder="B variant" class="apple-input text-xs w-full py-1.5 row-opt-b">
                     <input type="text" placeholder="C variant" class="apple-input text-xs w-full py-1.5 row-opt-c">
                     <input type="text" placeholder="D variant" class="apple-input text-xs w-full py-1.5 row-opt-d">
                 </div>
-                <div class="w-1/3">
-                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">To'g'ri javob</label>
-                    <select class="apple-input text-xs w-full py-1">
+
+                <!-- Answer Container (Select for MC, Text Input for SA) -->
+                <div class="w-full sm:w-1/2 row-answer-container">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">To'g'ri javob</label>
+                    <select class="apple-input text-xs w-full py-1.5 row-correct-select">
                         <option value="A">A</option>
                         <option value="B">B</option>
                         <option value="C">C</option>
                         <option value="D">D</option>
                     </select>
+                    <input type="text" placeholder="To'g'ri javobni yozing (masalan: Apple)" class="apple-input text-xs w-full py-1.5 row-correct-input hidden">
                 </div>
             `;
             container.appendChild(row);
+        }
+
+        function toggleRowQuestionType(selectEl) {
+            const row = selectEl.closest('.question-row');
+            const optionsGrid = row.querySelector('.row-options-grid');
+            const correctSelect = row.querySelector('.row-correct-select');
+            const correctInput = row.querySelector('.row-correct-input');
+            
+            if (selectEl.value === 'sa') {
+                optionsGrid.classList.add('hidden');
+                correctSelect.classList.add('hidden');
+                correctInput.classList.remove('hidden');
+            } else {
+                optionsGrid.classList.remove('hidden');
+                correctSelect.classList.remove('hidden');
+                correctInput.classList.add('hidden');
+            }
         }
 
         let uploadedAudioUrl = "";
@@ -1219,23 +1266,45 @@
             const questionsList = [];
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
-                const qText = row.querySelector('input[type="text"]').value.trim();
-                const optA = row.querySelector('.row-opt-a').value.trim();
-                const optB = row.querySelector('.row-opt-b').value.trim();
-                const optC = row.querySelector('.row-opt-c').value.trim();
-                const optD = row.querySelector('.row-opt-d').value.trim();
-                const answer = row.querySelector('select').value;
+                const qText = row.querySelector('.row-q-text').value.trim();
+                const typeVal = row.querySelector('.row-q-type').value;
                 
-                if (!qText || !optA || !optB) {
-                    showAlert(`Savol #${i+1} ni to'liq to'ldiring.`);
+                if (!qText) {
+                    showAlert(`Savol #${i+1} matnini kiriting.`);
                     return;
                 }
-                questionsList.push({
-                    id: i + 1,
-                    q: qText,
-                    options: [`A: ${optA}`, `B: ${optB}`, `C: ${optC}`, `D: ${optD}`].filter(o => o.split(': ')[1]),
-                    answer: answer
-                });
+                
+                if (typeVal === 'mc') {
+                    const optA = row.querySelector('.row-opt-a').value.trim();
+                    const optB = row.querySelector('.row-opt-b').value.trim();
+                    const optC = row.querySelector('.row-opt-c').value.trim();
+                    const optD = row.querySelector('.row-opt-d').value.trim();
+                    const answer = row.querySelector('.row-correct-select').value;
+                    
+                    if (!optA || !optB) {
+                        showAlert(`Savol #${i+1} variantlarini (kamida A va B) to'ldiring.`);
+                        return;
+                    }
+                    
+                    questionsList.push({
+                        id: i + 1,
+                        q: qText,
+                        options: [`A: ${optA}`, `B: ${optB}`, `C: ${optC}`, `D: ${optD}`].filter(o => o.split(': ')[1]),
+                        answer: answer
+                    });
+                } else {
+                    const answer = row.querySelector('.row-correct-input').value.trim();
+                    if (!answer) {
+                        showAlert(`Savol #${i+1} uchun to'g'ri javobni yozing.`);
+                        return;
+                    }
+                    questionsList.push({
+                        id: i + 1,
+                        q: qText,
+                        options: [],
+                        answer: answer
+                    });
+                }
             }
 
             if (questionsList.length === 0) {
