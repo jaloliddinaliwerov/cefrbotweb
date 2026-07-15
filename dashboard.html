@@ -231,6 +231,12 @@
                     <button onclick="switchAdminSubTab('users')" id="admin-sub-nav-users" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
                         <i class="fa-solid fa-users mr-1.5"></i>O'quvchilar & Ovozlar
                     </button>
+                    <button onclick="switchAdminSubTab('payments')" id="admin-sub-nav-payments" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
+                        <i class="fa-solid fa-credit-card mr-1.5"></i>To'lovlar
+                    </button>
+                    <button onclick="switchAdminSubTab('settings')" id="admin-sub-nav-settings" class="segmented-btn px-4 py-1.5 text-xs font-semibold whitespace-nowrap">
+                        <i class="fa-solid fa-gear mr-1.5"></i>Sozlamalar
+                    </button>
                 </div>
 
                 <!-- 1. Reading / Listening Manager -->
@@ -486,6 +492,62 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 5. To'lovlar (Pending Payments) -->
+                <div id="admin-sub-payments" class="admin-sub-content hidden space-y-6">
+                    <div class="apple-card p-6 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-md font-bold tracking-tight text-slate-800">
+                                <i class="fa-solid fa-credit-card text-emerald-500 mr-2"></i>
+                                Kutilayotgan To'lovlar
+                            </h3>
+                            <button onclick="loadPendingPayments()" class="apple-btn-secondary py-1 px-3 text-xs">
+                                <i class="fa-solid fa-rotate mr-1"></i>Yangilash
+                            </button>
+                        </div>
+                        <div id="admin-payments-list" class="space-y-3">
+                            <p class="text-xs text-slate-400 text-center py-4">Yuklanmoqda...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Sozlamalar (Settings) -->
+                <div id="admin-sub-settings" class="admin-sub-content hidden space-y-6">
+                    <div class="apple-card p-6 space-y-5 max-w-lg">
+                        <h3 class="text-md font-bold tracking-tight text-slate-800">
+                            <i class="fa-solid fa-gear text-slate-500 mr-2"></i>Bot Sozlamalari
+                        </h3>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                💳 To'lov Karta Raqami
+                            </label>
+                            <input type="text" id="setting-card-number"
+                                placeholder="8600 1234 5678 9012"
+                                class="apple-input text-sm w-full font-mono tracking-widest">
+                            <p class="text-[10px] text-slate-400">
+                                Foydalanuvchilar Mock sotib olmoqchi bo'lganda ushbu karta raqami ko'rsatiladi.
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                                📱 Karta Egasining Ismi (ixtiyoriy)
+                            </label>
+                            <input type="text" id="setting-card-owner"
+                                placeholder="Ism Familiya"
+                                class="apple-input text-sm w-full">
+                        </div>
+
+                        <button onclick="saveCardSettings()" class="apple-btn-primary py-2.5 px-6 text-xs font-semibold">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i>Saqlash
+                        </button>
+                        <div id="settings-save-msg" class="hidden text-xs text-emerald-600 font-semibold">
+                            ✅ Saqlandi!
+                        </div>
+                    </div>
+                </div>
+
             </section>
         </main>
         
@@ -625,6 +687,10 @@
 
             document.querySelectorAll('.segmented-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(`admin-sub-nav-${subName}`).classList.add('active');
+
+            // Auto-load on tab switch
+            if (subName === 'payments') loadPendingPayments();
+            if (subName === 'settings') loadCardSettings();
         }
 
         function checkAdminStatus() {
@@ -682,6 +748,7 @@
             loadAdminMocks();
             loadAdminUsers();
             loadAdminSpeakingSubmissions();
+            loadCardSettings();
         }
 
         async function loadAdminUsers() {
@@ -744,6 +811,120 @@
             } catch (err) {
                 console.error(err);
             }
+        }
+
+        async function loadPendingPayments() {
+            const container = document.getElementById('admin-payments-list');
+            container.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Yuklanmoqda...</p>';
+            try {
+                const res = await fetch(`${API_URL}/api/admin/pending-payments`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const payments = await res.json();
+                if (!payments.length) {
+                    container.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">Kutilayotgan to\'lovlar yo\'q 🎉</p>';
+                    return;
+                }
+                container.innerHTML = '';
+                payments.forEach(p => {
+                    const screenshotUrl = p.screenshot_file_id
+                        ? `${API_URL}/api/admin/voice/${p.screenshot_file_id}?token=${adminToken}`
+                        : '';
+                    // Use photo endpoint
+                    const photoUrl = p.screenshot_file_id
+                        ? `https://api.telegram.org/file/bot` // We'll fetch via backend
+                        : '';
+                    container.innerHTML += `
+                        <div class="p-4 border border-slate-200 rounded-2xl bg-white space-y-3 shadow-sm">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h4 class="font-bold text-xs text-slate-800">${p.user_name} (@${p.user_username || ''})</h4>
+                                    <p class="text-[10px] text-slate-500">${p.purchased_at}</p>
+                                </div>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
+                                    Kutilmoqda
+                                </span>
+                            </div>
+                            <p class="text-xs font-semibold text-slate-700">🎓 ${p.mock_title} — ${p.mock_price.toLocaleString()} UZS</p>
+                            ${p.screenshot_file_id ? `
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Chek (Screenshot):</p>
+                                <a href="${API_URL}/api/admin/voice/${p.screenshot_file_id}?token=${adminToken}" target="_blank"
+                                   class="text-xs text-blue-500 underline">Rasmni ko'rish (yangi oynada ochiladi)</a>
+                            </div>` : ''}
+                            <div class="flex gap-2 pt-1">
+                                <button onclick="approvePurchase(${p.id}, ${p.user_id})"
+                                    class="apple-btn-primary py-1.5 px-4 text-xs flex-1">✅ Tasdiqlash</button>
+                                <button onclick="rejectPurchase(${p.id}, ${p.user_id})"
+                                    class="apple-btn-secondary py-1.5 px-4 text-xs flex-1 text-red-500 border-red-200 hover:bg-red-50">❌ Rad etish</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch(err) {
+                container.innerHTML = '<p class="text-xs text-red-400 text-center py-4">Xatolik yuz berdi.</p>';
+            }
+        }
+
+        async function approvePurchase(purchaseId, userId) {
+            if (!confirm('Bu to\'lovni tasdiqlaysizmi?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/approve-purchase/${purchaseId}/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                if (res.ok) {
+                    showAlert('✅ Tasdiqlandi! Foydalanuvchiga xabar ketdi.');
+                    loadPendingPayments();
+                }
+            } catch(err) { showAlert('Xatolik: ' + err.message); }
+        }
+
+        async function rejectPurchase(purchaseId, userId) {
+            if (!confirm('Bu to\'lovni rad etasizmi?')) return;
+            try {
+                const res = await fetch(`${API_URL}/api/admin/reject-purchase/${purchaseId}/${userId}`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                if (res.ok) {
+                    showAlert('❌ Rad etildi. Foydalanuvchiga xabar ketdi.');
+                    loadPendingPayments();
+                }
+            } catch(err) { showAlert('Xatolik: ' + err.message); }
+        }
+
+        async function loadCardSettings() {
+            try {
+                const res = await fetch(`${API_URL}/api/admin/settings`, {
+                    headers: { 'Authorization': `Bearer ${adminToken}` }
+                });
+                const settings = await res.json();
+                if (settings.card_number) document.getElementById('setting-card-number').value = settings.card_number;
+                if (settings.card_owner) document.getElementById('setting-card-owner').value = settings.card_owner;
+            } catch(err) { console.error(err); }
+        }
+
+        async function saveCardSettings() {
+            const cardNum = document.getElementById('setting-card-number').value.trim();
+            const cardOwner = document.getElementById('setting-card-owner').value.trim();
+            try {
+                await Promise.all([
+                    fetch(`${API_URL}/api/admin/settings/card_number`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ value: cardNum })
+                    }),
+                    fetch(`${API_URL}/api/admin/settings/card_owner`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ value: cardOwner })
+                    })
+                ]);
+                const msg = document.getElementById('settings-save-msg');
+                msg.classList.remove('hidden');
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+            } catch(err) { showAlert('Saqlashda xatolik: ' + err.message); }
         }
 
         async function loadAdminQuestions() {
