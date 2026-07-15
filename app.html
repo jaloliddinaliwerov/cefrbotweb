@@ -180,16 +180,32 @@
                         <i class="fa-solid fa-shield-halved"></i>
                     </div>
                     <h3 class="text-xl font-bold tracking-tight text-slate-900">Admin Panelga Kirish</h3>
-                    <p class="text-slate-450 text-xs mt-1">Tokenni kiriting va boshqaruvni yoqing.</p>
+                    <p class="text-slate-500 text-xs mt-1">Botdan olingan tokenni quyiga joylashtiring.</p>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 space-y-1">
+                    <p class="font-bold">📋 Qanday kiraman?</p>
+                    <p>1. Botga <code class="bg-blue-100 px-1 rounded">/admin</code> yozing</p>
+                    <p>2. Bot yuborgan <strong>Xavfsizlik Tokeni</strong>ni nusxalang</p>
+                    <p>3. Quyidagi maydonga joylashtiring va kirish bosing</p>
                 </div>
                 
                 <div class="space-y-2">
-                    <label class="text-[10px] font-bold text-slate-555 uppercase tracking-wider">Xavfsizlik kaliti (Token)</label>
-                    <input type="password" id="admin-token-input" placeholder="Token kalitini kiriting..." class="apple-input text-xs w-full">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Xavfsizlik Tokeni</label>
+                    <input type="text" id="admin-token-input" placeholder="Misol: 123456789:abcd1234efgh5678" class="apple-input text-xs w-full font-mono">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Backend API URL (Railway)</label>
+                    <input type="text" id="login-api-url-input" placeholder="https://your-bot.up.railway.app" class="apple-input text-xs w-full">
+                    <p class="text-[10px] text-slate-400">Botdagi "Backend API URL" qiymatini kiriting</p>
                 </div>
                 
-                <button onclick="loginAdmin()" class="w-full apple-btn-primary py-2.5 text-xs font-semibold">Tizimga kirish</button>
+                <button onclick="loginAdmin()" class="w-full apple-btn-primary py-2.5 text-xs font-semibold">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i>Tizimga kirish
+                </button>
             </section>
+
 
             <!-- Admin Dashboard (Hidden initially) -->
             <section id="admin-dashboard" class="hidden space-y-8">
@@ -632,9 +648,23 @@
         function loginAdmin() {
             const token = document.getElementById('admin-token-input').value.trim();
             if (!token) {
-                showAlert("Iltimos token kiriting.");
+                showAlert("Iltimos token kiriting.\nBotga /admin yozib, tokenni nusxalab shu yerga joylashtiring.");
                 return;
             }
+            if (!token.includes(':') || token.split(':')[1].length !== 16) {
+                showAlert("Token noto'g'ri formatda!\nTo'g'ri format: 123456789:abcd1234efgh5678\n\nBotga /admin yozib, tokenni qayta nusxalab ko'ring.");
+                return;
+            }
+
+            // Also save API URL from login form if provided
+            const loginApiUrl = document.getElementById('login-api-url-input')?.value.trim().replace(/\/$/, "");
+            if (loginApiUrl && loginApiUrl.startsWith('http') && !loginApiUrl.includes('vercel.app')) {
+                localStorage.setItem('api_url', loginApiUrl);
+                API_URL = loginApiUrl;
+                document.getElementById('api-url-input').value = API_URL;
+                updateApiStatusBadge();
+            }
+
             localStorage.setItem('admin_token', token);
             adminToken = token;
             checkAdminStatus();
