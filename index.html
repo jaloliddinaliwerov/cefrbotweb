@@ -413,7 +413,7 @@
                             <button type="button" onclick="resetMockForm()" id="mock-btn-cancel" class="apple-btn-secondary py-1 px-3 text-xs hidden">Bekor qilish</button>
                         </div>
                         
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imtihon nomi</label>
                                 <input type="text" id="mock-title" placeholder="Masalan: CEFR Mock Exam #2" class="apple-input text-xs w-full">
@@ -421,6 +421,10 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Narxi (UZS)</label>
                                 <input type="number" id="mock-price" value="30000" class="apple-input text-xs w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Telegram Kanal (PDF Mock uchun)</label>
+                                <input type="text" id="mock-channel" placeholder="Masalan: @mock_channel" class="apple-input text-xs w-full">
                             </div>
                         </div>
 
@@ -1624,6 +1628,7 @@
             document.getElementById('mock-btn-cancel').classList.add('hidden');
             document.getElementById('mock-title').value = '';
             document.getElementById('mock-price').value = '30000';
+            document.getElementById('mock-channel').value = '';
             document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => el.checked = false);
         }
 
@@ -1637,15 +1642,16 @@
             
             document.getElementById('mock-title').value = mock.title;
             document.getElementById('mock-price').value = mock.price;
+            document.getElementById('mock-channel').value = mock.channel_link || '';
             
             document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => {
                 const val = parseInt(el.value);
                 if (el.classList.contains('mock-q-checkbox')) {
-                    el.checked = mock.questions_ids.includes(val);
+                    el.checked = (mock.questions_ids || []).includes(val);
                 } else if (el.classList.contains('mock-w-checkbox')) {
-                    el.checked = mock.writing_ids.includes(val);
+                    el.checked = (mock.writing_ids || []).includes(val);
                 } else if (el.classList.contains('mock-s-checkbox')) {
-                    el.checked = mock.speaking_ids.includes(val);
+                    el.checked = (mock.speaking_ids || []).includes(val);
                 }
             });
             
@@ -1717,13 +1723,14 @@
             const questions_ids = Array.from(document.querySelectorAll('.mock-q-checkbox:checked')).map(el => parseInt(el.value));
             const writing_ids = Array.from(document.querySelectorAll('.mock-w-checkbox:checked')).map(el => parseInt(el.value));
             const speaking_ids = Array.from(document.querySelectorAll('.mock-s-checkbox:checked')).map(el => parseInt(el.value));
+            const channel_link = document.getElementById('mock-channel').value.trim() || null;
 
-            if (questions_ids.length === 0 && writing_ids.length === 0 && speaking_ids.length === 0) {
-                showAlert("Kamida bitta topshiriq tanlang.");
+            if (!channel_link && questions_ids.length === 0 && writing_ids.length === 0 && speaking_ids.length === 0) {
+                showAlert("Kamida bitta topshiriq tanlang yoki Telegram Kanal havolasini kiriting.");
                 return;
             }
 
-            const payload = { title, price, questions_ids, writing_ids, speaking_ids, active: true };
+            const payload = { title, price, questions_ids, writing_ids, speaking_ids, active: true, channel_link };
 
             const url = editingMockId
                 ? `${API_URL}/api/admin/mock-exams/${editingMockId}`
