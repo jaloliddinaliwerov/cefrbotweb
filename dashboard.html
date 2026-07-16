@@ -547,6 +547,60 @@
                                 class="apple-input text-sm w-full">
                         </div>
 
+                        <hr class="border-slate-100 my-4">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            📢 PDF Savollar uchun Telegram Kanallar
+                        </h4>
+                        <p class="text-[10px] text-slate-400">
+                            Bot ushbu kanallarga joylangan PDF-larni avtomatik o'qib, o'quvchilar ishlashi uchun test shakliga o'tkazadi (Kanal linki yoki ID shaklida kiritiladi, masalan: @read1_chan yoki -100123456789).
+                        </p>
+                        
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">📖 Reading Part 1 Kanal</label>
+                                <input type="text" id="chan-read-1" placeholder="@read1_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">📖 Reading Part 2 Kanal</label>
+                                <input type="text" id="chan-read-2" placeholder="@read2_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">📖 Reading Part 3 Kanal</label>
+                                <input type="text" id="chan-read-3" placeholder="@read3_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">📖 Reading Part 4 Kanal</label>
+                                <input type="text" id="chan-read-4" placeholder="@read4_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">📖 Reading Part 5 Kanal</label>
+                                <input type="text" id="chan-read-5" placeholder="@read5_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 pt-2">
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">🎧 Listening Part 1 Kanal</label>
+                                <input type="text" id="chan-list-1" placeholder="@list1_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">🎧 Listening Part 2 Kanal</label>
+                                <input type="text" id="chan-list-2" placeholder="@list2_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">🎧 Listening Part 3 Kanal</label>
+                                <input type="text" id="chan-list-3" placeholder="@list3_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">🎧 Listening Part 4 Kanal</label>
+                                <input type="text" id="chan-list-4" placeholder="@list4_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider">🎧 Listening Part 5 Kanal</label>
+                                <input type="text" id="chan-list-5" placeholder="@list5_chan" class="apple-input text-xs w-full py-1.5">
+                            </div>
+                        </div>
+
                         <button onclick="saveCardSettings()" class="apple-btn-primary py-2.5 px-6 text-xs font-semibold">
                             <i class="fa-solid fa-floppy-disk mr-2"></i>Saqlash
                         </button>
@@ -915,25 +969,52 @@
                 const settings = await res.json();
                 if (settings.card_number) document.getElementById('setting-card-number').value = settings.card_number;
                 if (settings.card_owner) document.getElementById('setting-card-owner').value = settings.card_owner;
+                
+                const keys = [
+                    'chan_read_1', 'chan_read_2', 'chan_read_3', 'chan_read_4', 'chan_read_5',
+                    'chan_list_1', 'chan_list_2', 'chan_list_3', 'chan_list_4', 'chan_list_5'
+                ];
+                keys.forEach(k => {
+                    const el = document.getElementById(k.replaceAll('_', '-'));
+                    if (el && settings[k]) el.value = settings[k];
+                });
             } catch(err) { console.error(err); }
         }
 
         async function saveCardSettings() {
             const cardNum = document.getElementById('setting-card-number').value.trim();
             const cardOwner = document.getElementById('setting-card-owner').value.trim();
-            try {
-                await Promise.all([
-                    fetch(`${API_URL}/api/admin/settings/card_number`, {
+            
+            const reqs = [
+                fetch(`${API_URL}/api/admin/settings/card_number`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: cardNum })
+                }),
+                fetch(`${API_URL}/api/admin/settings/card_owner`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ value: cardOwner })
+                })
+            ];
+            
+            const keys = [
+                'chan_read_1', 'chan_read_2', 'chan_read_3', 'chan_read_4', 'chan_read_5',
+                'chan_list_1', 'chan_list_2', 'chan_list_3', 'chan_list_4', 'chan_list_5'
+            ];
+            keys.forEach(k => {
+                const val = document.getElementById(k.replaceAll('_', '-')).value.trim();
+                reqs.push(
+                    fetch(`${API_URL}/api/admin/settings/${k}`, {
                         method: 'PUT',
                         headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ value: cardNum })
-                    }),
-                    fetch(`${API_URL}/api/admin/settings/card_owner`, {
-                        method: 'PUT',
-                        headers: { 'Authorization': `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ value: cardOwner })
+                        body: JSON.stringify({ value: val })
                     })
-                ]);
+                );
+            });
+
+            try {
+                await Promise.all(reqs);
                 const msg = document.getElementById('settings-save-msg');
                 msg.classList.remove('hidden');
                 setTimeout(() => msg.classList.add('hidden'), 3000);
