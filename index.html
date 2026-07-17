@@ -305,6 +305,12 @@
                             <p class="text-[9px] text-slate-400">PDF fayli bo'lgan telegram kanaldagi xabar ssilkasi (agar kiritilsa, foydalanuvchiga to'g'ridan-to'g'ri o'sha xabar yuboriladi).</p>
                         </div>
 
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">🔑 Javoblar Kaliti (Tezkor kiritish)</label>
+                            <textarea id="q-answers-key" placeholder="Masalan: 1-A, 2-C, 3-Apple, 4-Orange..." class="apple-input text-xs w-full" rows="3"></textarea>
+                            <p class="text-[9px] text-slate-400">Javoblarni ketma-ket yozing. Masalan: 1-A, 2-B yoki 1. A, 2. B, 3. Apple (Dynamic Questions Builder o'rnida ishlatiladi).</p>
+                        </div>
+
                         <!-- Dynamic Questions Builder -->
                         <div class="space-y-4 border-t border-slate-200 pt-5">
                             <div class="flex items-center justify-between">
@@ -1092,6 +1098,7 @@
             document.getElementById('q-text').value = '';
             document.getElementById('q-audio-url').value = '';
             document.getElementById('q-pdf-url').value = '';
+            document.getElementById('q-answers-key').value = '';
             uploadedAudioUrl = "";
             const fileInput = document.getElementById('q-audio-file');
             if (fileInput) fileInput.value = "";
@@ -1121,6 +1128,15 @@
             document.getElementById('q-part').value = q.part;
             document.getElementById('q-title').value = q.title;
             document.getElementById('q-pdf-url').value = q.pdf_file_id || '';
+            
+            let qAnswersStr = "";
+            if (q.questions_json && q.questions_json.length > 0) {
+                qAnswersStr = q.questions_json
+                    .map(item => `${item.id}-${item.answer}`)
+                    .join(', ');
+            }
+            document.getElementById('q-answers-key').value = qAnswersStr;
+
             toggleQuestionFields();
             
             if (q.section === 'reading') {
@@ -1369,53 +1385,73 @@
                 return;
             }
             
-            const rows = document.querySelectorAll('.question-row');
+            const answersKeyInput = document.getElementById('q-answers-key').value.trim();
             const questionsList = [];
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const qText = row.querySelector('.row-q-text').value.trim();
-                const typeVal = row.querySelector('.row-q-type').value;
-                
-                if (!qText) {
-                    showAlert(`Savol #${i+1} matnini kiriting.`);
+
+            if (answersKeyInput) {
+                const matches = answersKeyInput.matchAll(/(\d+)[\s\-:.]*([^\s,;]+)/g);
+                for (const match of matches) {
+                    const qNum = parseInt(match[1]);
+                    const ansVal = match[2].trim();
+                    questionsList.push({
+                        id: qNum,
+                        q: `Savol ${qNum}`,
+                        options: [],
+                        answer: ansVal
+                    });
+                }
+                if (questionsList.length === 0) {
+                    showAlert("Javoblar kalitidan savollarni o'qib bo'lmadi. Formatni tekshiring (masalan: 1-A, 2-C).");
                     return;
                 }
-                
-                if (typeVal === 'mc') {
-                    const optA = row.querySelector('.row-opt-a').value.trim();
-                    const optB = row.querySelector('.row-opt-b').value.trim();
-                    const optC = row.querySelector('.row-opt-c').value.trim();
-                    const optD = row.querySelector('.row-opt-d').value.trim();
-                    const answer = row.querySelector('.row-correct-select').value;
+            } else {
+                const rows = document.querySelectorAll('.question-row');
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const qText = row.querySelector('.row-q-text').value.trim();
+                    const typeVal = row.querySelector('.row-q-type').value;
                     
-                    if (!optA || !optB) {
-                        showAlert(`Savol #${i+1} variantlarini (kamida A va B) to'ldiring.`);
+                    if (!qText) {
+                        showAlert(`Savol #${i+1} matnini kiriting.`);
                         return;
                     }
                     
-                    questionsList.push({
-                        id: i + 1,
-                        q: qText,
-                        options: [`A: ${optA}`, `B: ${optB}`, `C: ${optC}`, `D: ${optD}`].filter(o => o.split(': ')[1]),
-                        answer: answer
-                    });
-                } else {
-                    const answer = row.querySelector('.row-correct-input').value.trim();
-                    if (!answer) {
-                        showAlert(`Savol #${i+1} uchun to'g'ri javobni yozing.`);
-                        return;
+                    if (typeVal === 'mc') {
+                        const optA = row.querySelector('.row-opt-a').value.trim();
+                        const optB = row.querySelector('.row-opt-b').value.trim();
+                        const optC = row.querySelector('.row-opt-c').value.trim();
+                        const optD = row.querySelector('.row-opt-d').value.trim();
+                        const answer = row.querySelector('.row-correct-select').value;
+                        
+                        if (!optA || !optB) {
+                            showAlert(`Savol #${i+1} variantlarini (kamida A va B) to'ldiring.`);
+                            return;
+                        }
+                        
+                        questionsList.push({
+                            id: i + 1,
+                            q: qText,
+                            options: [`A: ${optA}`, `B: ${optB}`, `C: ${optC}`, `D: ${optD}`].filter(o => o.split(': ')[1]),
+                            answer: answer
+                        });
+                    } else {
+                        const answer = row.querySelector('.row-correct-input').value.trim();
+                        if (!answer) {
+                            showAlert(`Savol #${i+1} uchun to'g'ri javobni yozing.`);
+                            return;
+                        }
+                        questionsList.push({
+                            id: i + 1,
+                            q: qText,
+                            options: [],
+                            answer: answer
+                        });
                     }
-                    questionsList.push({
-                        id: i + 1,
-                        q: qText,
-                        options: [],
-                        answer: answer
-                    });
                 }
             }
 
             if (questionsList.length === 0) {
-                showAlert("Kamida bitta savol qo'shing.");
+                showAlert("Kamida bitta javob kiriting yoki Dynamic Questions Builder-dan foydalaning.");
                 return;
             }
 
