@@ -1218,11 +1218,15 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    showAlert("O'chirildi!");
+                    showAlert("✅ Test muvaffaqiyatli o'chirildi!");
                     loadAdminQuestions();
+                } else {
+                    let errMsg = `Xatolik: ${res.status} ${res.statusText}`;
+                    try { const d = await res.json(); errMsg = d.detail || errMsg; } catch(e) {}
+                    showAlert("❌ O'chirishda xatolik: " + errMsg);
                 }
             } catch (err) {
-                showAlert("Xatolik.");
+                showAlert("❌ Tarmoq xatosi: " + err.message);
             }
         }
 
@@ -1736,11 +1740,15 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    showAlert("O'chirildi!");
+                    showAlert("✅ Mock imtihon o'chirildi!");
                     loadAdminMocks();
+                } else {
+                    let errMsg = `Xatolik: ${res.status} ${res.statusText}`;
+                    try { const d = await res.json(); errMsg = d.detail || errMsg; } catch(e) {}
+                    showAlert("❌ O'chirishda xatolik: " + errMsg);
                 }
             } catch (err) {
-                showAlert("Xatolik.");
+                showAlert("❌ Tarmoq xatosi: " + err.message);
             }
         }
 
