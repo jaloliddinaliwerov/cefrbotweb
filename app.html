@@ -299,6 +299,18 @@
                             </div>
                         </div>
 
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">📄 Telegram PDF Post Link (ixtiyoriy)</label>
+                            <input type="text" id="q-pdf-url" placeholder="https://t.me/mychannel/123" class="apple-input text-xs w-full">
+                            <p class="text-[9px] text-slate-400">PDF fayli bo'lgan telegram kanaldagi xabar ssilkasi (agar kiritilsa, foydalanuvchiga to'g'ridan-to'g'ri o'sha xabar yuboriladi).</p>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">🔑 Javoblar Kaliti (Tezkor kiritish)</label>
+                            <textarea id="q-answers-key" placeholder="Masalan: 1-A, 2-C, 3-Apple, 4-Orange..." class="apple-input text-xs w-full" rows="3"></textarea>
+                            <p class="text-[9px] text-slate-400">Javoblarni ketma-ket yozing. Masalan: 1-A, 2-B yoki 1. A, 2. B, 3. Apple (Dynamic Questions Builder o'rnida ishlatiladi).</p>
+                        </div>
+
                         <!-- Dynamic Questions Builder -->
                         <div class="space-y-4 border-t border-slate-200 pt-5">
                             <div class="flex items-center justify-between">
@@ -413,7 +425,7 @@
                             <button type="button" onclick="resetMockForm()" id="mock-btn-cancel" class="apple-btn-secondary py-1 px-3 text-xs hidden">Bekor qilish</button>
                         </div>
                         
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imtihon nomi</label>
                                 <input type="text" id="mock-title" placeholder="Masalan: CEFR Mock Exam #2" class="apple-input text-xs w-full">
@@ -421,6 +433,23 @@
                             <div>
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Narxi (UZS)</label>
                                 <input type="number" id="mock-price" value="30000" class="apple-input text-xs w-full">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Telegram Kanal (PDF Mock uchun)</label>
+                                <input type="text" id="mock-channel" placeholder="Masalan: @mock_channel" class="apple-input text-xs w-full">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">📄 Telegram PDF Post Link (ixtiyoriy)</label>
+                                <input type="text" id="mock-pdf-url" placeholder="https://t.me/mychannel/123" class="apple-input text-xs w-full">
+                                <p class="text-[9px] text-slate-400">PDF Mock testi bo'lgan Telegram xabar ssilkasi.</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">🔑 Mock Javoblari Kaliti (PDF uchun)</label>
+                                <textarea id="mock-answers" placeholder="Masalan: 1-A, 2-C, 3-B, 4-D..." class="apple-input text-xs w-full" rows="2"></textarea>
+                                <p class="text-[9px] text-slate-400">PDF Mock javoblari kaliti (masalan: 1-A, 2-B, 3-C...).</p>
                             </div>
                         </div>
 
@@ -1068,6 +1097,8 @@
             document.getElementById('q-type').value = 'practice';
             document.getElementById('q-text').value = '';
             document.getElementById('q-audio-url').value = '';
+            document.getElementById('q-pdf-url').value = '';
+            document.getElementById('q-answers-key').value = '';
             uploadedAudioUrl = "";
             const fileInput = document.getElementById('q-audio-file');
             if (fileInput) fileInput.value = "";
@@ -1096,6 +1127,16 @@
             }
             document.getElementById('q-part').value = q.part;
             document.getElementById('q-title').value = q.title;
+            document.getElementById('q-pdf-url').value = q.pdf_file_id || '';
+            
+            let qAnswersStr = "";
+            if (q.questions_json && q.questions_json.length > 0) {
+                qAnswersStr = q.questions_json
+                    .map(item => `${item.id}-${item.answer}`)
+                    .join(', ');
+            }
+            document.getElementById('q-answers-key').value = qAnswersStr;
+
             toggleQuestionFields();
             
             if (q.section === 'reading') {
@@ -1177,11 +1218,15 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    showAlert("O'chirildi!");
+                    showAlert("✅ Test muvaffaqiyatli o'chirildi!");
                     loadAdminQuestions();
+                } else {
+                    let errMsg = `Xatolik: ${res.status} ${res.statusText}`;
+                    try { const d = await res.json(); errMsg = d.detail || errMsg; } catch(e) {}
+                    showAlert("❌ O'chirishda xatolik: " + errMsg);
                 }
             } catch (err) {
-                showAlert("Xatolik.");
+                showAlert("❌ Tarmoq xatosi: " + err.message);
             }
         }
 
@@ -1337,59 +1382,80 @@
             const text = document.getElementById('q-text').value.trim();
             const audioUrlInput = document.getElementById('q-audio-url').value.trim();
             const audioUrl = uploadedAudioUrl ? uploadedAudioUrl : audioUrlInput;
+            const pdfFileIdInput = document.getElementById('q-pdf-url').value.trim();
             
             if (!title) {
                 showAlert("Sarlavhani kiriting.");
                 return;
             }
             
-            const rows = document.querySelectorAll('.question-row');
+            const answersKeyInput = document.getElementById('q-answers-key').value.trim();
             const questionsList = [];
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                const qText = row.querySelector('.row-q-text').value.trim();
-                const typeVal = row.querySelector('.row-q-type').value;
-                
-                if (!qText) {
-                    showAlert(`Savol #${i+1} matnini kiriting.`);
+
+            if (answersKeyInput) {
+                const matches = answersKeyInput.matchAll(/(\d+)[\s\-:.]*([^\s,;]+)/g);
+                for (const match of matches) {
+                    const qNum = parseInt(match[1]);
+                    const ansVal = match[2].trim();
+                    questionsList.push({
+                        id: qNum,
+                        q: `Savol ${qNum}`,
+                        options: [],
+                        answer: ansVal
+                    });
+                }
+                if (questionsList.length === 0) {
+                    showAlert("Javoblar kalitidan savollarni o'qib bo'lmadi. Formatni tekshiring (masalan: 1-A, 2-C).");
                     return;
                 }
-                
-                if (typeVal === 'mc') {
-                    const optA = row.querySelector('.row-opt-a').value.trim();
-                    const optB = row.querySelector('.row-opt-b').value.trim();
-                    const optC = row.querySelector('.row-opt-c').value.trim();
-                    const optD = row.querySelector('.row-opt-d').value.trim();
-                    const answer = row.querySelector('.row-correct-select').value;
+            } else {
+                const rows = document.querySelectorAll('.question-row');
+                for (let i = 0; i < rows.length; i++) {
+                    const row = rows[i];
+                    const qText = row.querySelector('.row-q-text').value.trim();
+                    const typeVal = row.querySelector('.row-q-type').value;
                     
-                    if (!optA || !optB) {
-                        showAlert(`Savol #${i+1} variantlarini (kamida A va B) to'ldiring.`);
+                    if (!qText) {
+                        showAlert(`Savol #${i+1} matnini kiriting.`);
                         return;
                     }
                     
-                    questionsList.push({
-                        id: i + 1,
-                        q: qText,
-                        options: [`A: ${optA}`, `B: ${optB}`, `C: ${optC}`, `D: ${optD}`].filter(o => o.split(': ')[1]),
-                        answer: answer
-                    });
-                } else {
-                    const answer = row.querySelector('.row-correct-input').value.trim();
-                    if (!answer) {
-                        showAlert(`Savol #${i+1} uchun to'g'ri javobni yozing.`);
-                        return;
+                    if (typeVal === 'mc') {
+                        const optA = row.querySelector('.row-opt-a').value.trim();
+                        const optB = row.querySelector('.row-opt-b').value.trim();
+                        const optC = row.querySelector('.row-opt-c').value.trim();
+                        const optD = row.querySelector('.row-opt-d').value.trim();
+                        const answer = row.querySelector('.row-correct-select').value;
+                        
+                        if (!optA || !optB) {
+                            showAlert(`Savol #${i+1} variantlarini (kamida A va B) to'ldiring.`);
+                            return;
+                        }
+                        
+                        questionsList.push({
+                            id: i + 1,
+                            q: qText,
+                            options: [`A: ${optA}`, `B: ${optB}`, `C: ${optC}`, `D: ${optD}`].filter(o => o.split(': ')[1]),
+                            answer: answer
+                        });
+                    } else {
+                        const answer = row.querySelector('.row-correct-input').value.trim();
+                        if (!answer) {
+                            showAlert(`Savol #${i+1} uchun to'g'ri javobni yozing.`);
+                            return;
+                        }
+                        questionsList.push({
+                            id: i + 1,
+                            q: qText,
+                            options: [],
+                            answer: answer
+                        });
                     }
-                    questionsList.push({
-                        id: i + 1,
-                        q: qText,
-                        options: [],
-                        answer: answer
-                    });
                 }
             }
 
             if (questionsList.length === 0) {
-                showAlert("Kamida bitta savol qo'shing.");
+                showAlert("Kamida bitta javob kiriting yoki Dynamic Questions Builder-dan foydalaning.");
                 return;
             }
 
@@ -1403,6 +1469,7 @@
                 title,
                 text: section === 'reading' ? text : null,
                 audio_url: section === 'listening' ? audioUrl : null,
+                pdf_file_id: pdfFileIdInput || null,
                 questions_json: questionsList,
                 is_mock: isMock,
                 is_daily: isDaily
@@ -1624,6 +1691,9 @@
             document.getElementById('mock-btn-cancel').classList.add('hidden');
             document.getElementById('mock-title').value = '';
             document.getElementById('mock-price').value = '30000';
+            document.getElementById('mock-channel').value = '';
+            document.getElementById('mock-pdf-url').value = '';
+            document.getElementById('mock-answers').value = '';
             document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => el.checked = false);
         }
 
@@ -1637,15 +1707,25 @@
             
             document.getElementById('mock-title').value = mock.title;
             document.getElementById('mock-price').value = mock.price;
+            document.getElementById('mock-channel').value = mock.channel_link || '';
+            document.getElementById('mock-pdf-url').value = mock.pdf_file_id || '';
+            
+            let answersStr = "";
+            if (mock.answers_json) {
+                answersStr = Object.entries(mock.answers_json)
+                    .map(([k, v]) => `${k}-${v}`)
+                    .join(', ');
+            }
+            document.getElementById('mock-answers').value = answersStr;
             
             document.querySelectorAll('.mock-q-checkbox, .mock-w-checkbox, .mock-s-checkbox').forEach(el => {
                 const val = parseInt(el.value);
                 if (el.classList.contains('mock-q-checkbox')) {
-                    el.checked = mock.questions_ids.includes(val);
+                    el.checked = (mock.questions_ids || []).includes(val);
                 } else if (el.classList.contains('mock-w-checkbox')) {
-                    el.checked = mock.writing_ids.includes(val);
+                    el.checked = (mock.writing_ids || []).includes(val);
                 } else if (el.classList.contains('mock-s-checkbox')) {
-                    el.checked = mock.speaking_ids.includes(val);
+                    el.checked = (mock.speaking_ids || []).includes(val);
                 }
             });
             
@@ -1660,11 +1740,15 @@
                     headers: { 'Authorization': `Bearer ${adminToken}` }
                 });
                 if (res.ok) {
-                    showAlert("O'chirildi!");
+                    showAlert("✅ Mock imtihon o'chirildi!");
                     loadAdminMocks();
+                } else {
+                    let errMsg = `Xatolik: ${res.status} ${res.statusText}`;
+                    try { const d = await res.json(); errMsg = d.detail || errMsg; } catch(e) {}
+                    showAlert("❌ O'chirishda xatolik: " + errMsg);
                 }
             } catch (err) {
-                showAlert("Xatolik.");
+                showAlert("❌ Tarmoq xatosi: " + err.message);
             }
         }
 
@@ -1717,13 +1801,25 @@
             const questions_ids = Array.from(document.querySelectorAll('.mock-q-checkbox:checked')).map(el => parseInt(el.value));
             const writing_ids = Array.from(document.querySelectorAll('.mock-w-checkbox:checked')).map(el => parseInt(el.value));
             const speaking_ids = Array.from(document.querySelectorAll('.mock-s-checkbox:checked')).map(el => parseInt(el.value));
+            const channel_link = document.getElementById('mock-channel').value.trim() || null;
+            const pdf_file_id = document.getElementById('mock-pdf-url').value.trim() || null;
+            const answersRaw = document.getElementById('mock-answers').value.trim();
+            let answers_json = null;
 
-            if (questions_ids.length === 0 && writing_ids.length === 0 && speaking_ids.length === 0) {
-                showAlert("Kamida bitta topshiriq tanlang.");
+            if (answersRaw) {
+                answers_json = {};
+                const matches = answersRaw.matchAll(/(\d+)[\s\-:.]*([^\s,;]+)/g);
+                for (const match of matches) {
+                    answers_json[match[1]] = match[2].trim().toUpperCase();
+                }
+            }
+
+            if (!channel_link && !pdf_file_id && questions_ids.length === 0 && writing_ids.length === 0 && speaking_ids.length === 0) {
+                showAlert("Kamida bitta topshiriq tanlang yoki Telegram Kanal/PDF havolasini kiriting.");
                 return;
             }
 
-            const payload = { title, price, questions_ids, writing_ids, speaking_ids, active: true };
+            const payload = { title, price, questions_ids, writing_ids, speaking_ids, active: true, channel_link, pdf_file_id, answers_json };
 
             const url = editingMockId
                 ? `${API_URL}/api/admin/mock-exams/${editingMockId}`
